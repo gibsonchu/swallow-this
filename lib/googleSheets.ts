@@ -125,7 +125,7 @@ export async function listSigns(options: { publishedOnly?: boolean } = {}) {
 
   try {
     const response = await sheetsFetch(
-      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:R")}`,
+      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:T")}`,
     );
     if (!response) return fallback;
 
@@ -159,7 +159,7 @@ export async function createSign(input: SignInput) {
   }
 
   await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:R")}:append?valueInputOption=USER_ENTERED`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}:append?valueInputOption=USER_ENTERED`,
     {
       method: "POST",
       body: JSON.stringify({

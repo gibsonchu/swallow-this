@@ -13,6 +13,7 @@ type UploadState = {
 const initialForm = {
   sign_title: "",
   restaurant_name: "",
+  designer: "",
   place_id: "",
   formatted_address: "",
   latitude: "",
@@ -23,6 +24,7 @@ const initialForm = {
   notes: "",
   tags: "",
   date_collected: new Date().toISOString().slice(0, 10),
+  date_visited: new Date().toISOString().slice(0, 10),
   published: false,
 };
 
@@ -39,6 +41,17 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   const setField = (field: string, value: string | boolean) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
+
+  const handlePlaceSelected = useCallback((place: {
+    place_id: string;
+    restaurant_name: string;
+    formatted_address: string;
+    latitude: string;
+    longitude: string;
+    google_maps_url: string;
+  }) => {
+    setForm((current) => ({ ...current, ...place }));
+  }, []);
 
   const uploadFile = useCallback(async (nextFile: File) => {
     setBusy("Uploading");
@@ -102,6 +115,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
+        date_collected: form.date_visited,
         image_original_url: upload.originalUrl,
         image_processed_url: upload.processedUrl || upload.originalUrl,
       }),
@@ -200,39 +214,24 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       </section>
 
       <section className="grid content-start gap-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Sign title/name</span>
-            <input className="border border-black/15 bg-white px-3 py-2" value={form.sign_title} onChange={(event) => setField("sign_title", event.target.value)} />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Restaurant name</span>
-            <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
-          </label>
-        </div>
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Restaurant name</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
+        </label>
 
         <PlaceAutocomplete
           apiKey={googleMapsApiKey}
-          onPlaceSelected={(place) => setForm((current) => ({ ...current, ...place }))}
+          onPlaceSelected={handlePlaceSelected}
         />
 
-        <label className="grid gap-1 text-sm">
-          <span className="font-medium">Address</span>
-          <input className="border border-black/15 bg-white px-3 py-2" value={form.formatted_address} onChange={(event) => setField("formatted_address", event.target.value)} />
-        </label>
-
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
-            <span className="font-medium">Borough</span>
-            <input className="border border-black/15 bg-white px-3 py-2" value={form.borough} onChange={(event) => setField("borough", event.target.value)} />
+            <span className="font-medium">Designer</span>
+            <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
           </label>
           <label className="grid gap-1 text-sm">
-            <span className="font-medium">Neighborhood</span>
-            <input className="border border-black/15 bg-white px-3 py-2" value={form.neighborhood} onChange={(event) => setField("neighborhood", event.target.value)} />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Date collected</span>
-            <input className="border border-black/15 bg-white px-3 py-2" type="date" value={form.date_collected} onChange={(event) => setField("date_collected", event.target.value)} />
+            <span className="font-medium">Date visited</span>
+            <input className="border border-black/15 bg-white px-3 py-2" type="date" value={form.date_visited} onChange={(event) => setField("date_visited", event.target.value)} />
           </label>
         </div>
 

@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   const result = await createSign({
     image_original_url: body.image_original_url || "",
     image_processed_url: body.image_processed_url || body.image_original_url || "",
-    sign_title: body.sign_title || "Untitled sign",
+    sign_title: "",
     restaurant_name: body.restaurant_name || "",
     place_id: body.place_id || "",
     formatted_address: body.formatted_address || "",
@@ -30,9 +30,11 @@ export async function POST(request: Request) {
     google_maps_url: body.google_maps_url || "",
     borough: body.borough || "",
     neighborhood: body.neighborhood || "",
+    designer: body.designer || "",
     notes: body.notes || "",
     tags: body.tags || "",
-    date_collected: body.date_collected || "",
+    date_collected: body.date_collected || body.date_visited || "",
+    date_visited: body.date_visited || body.date_collected || "",
     published: Boolean(body.published),
   });
 

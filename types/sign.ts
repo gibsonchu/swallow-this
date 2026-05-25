@@ -11,9 +11,11 @@ export type SignRecord = {
   google_maps_url: string;
   borough: string;
   neighborhood: string;
+  designer: string;
   notes: string;
   tags: string;
   date_collected: string;
+  date_visited: string;
   created_at: string;
   updated_at: string;
   published: boolean;
@@ -42,4 +44,6 @@ export const SHEET_COLUMNS = [
   "created_at",
   "updated_at",
   "published",
+  "designer",
+  "date_visited",
 ] as const;

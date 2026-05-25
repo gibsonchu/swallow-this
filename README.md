@@ -44,10 +44,10 @@ Create a Google Sheet with a tab named `Signs`.
 Add this exact header row in row 1:
 
 ```text
-id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published
+id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited
 ```
 
-The app reads from `Signs!A2:R` and appends new rows to `Signs!A:R`.
+The app reads and appends rows on the `Signs` tab. Address, borough, neighborhood, and the legacy sign title column are kept as hidden compatibility fields; the admin uses restaurant, place search, designer, notes, tags, date visited, and published.
 
 ## Google service account
 

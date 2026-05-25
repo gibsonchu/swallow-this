@@ -66,7 +66,8 @@ export function PlaceAutocomplete({
           new window.google.maps.LatLng(40.9176, -73.7004),
         ),
         strictBounds: false,
-        types: ["restaurant", "cafe", "bakery", "meal_takeaway"],
+        componentRestrictions: { country: "us" },
+        types: ["establishment"],
       });
 
       autocomplete.addListener("place_changed", () => {
@@ -88,7 +89,7 @@ export function PlaceAutocomplete({
                 )}&query_place_id=${place.place_id}`
               : ""),
         });
-        setStatus("Place selected");
+        setStatus(place.name ? `Selected: ${place.name}` : "Place selected");
       });
     };
 
@@ -100,8 +101,9 @@ export function PlaceAutocomplete({
 
     const script = document.createElement("script");
     script.dataset.googlePlaces = "true";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
     script.async = true;
+    script.onerror = () => setStatus("Google Places failed to load");
     script.onload = attach;
     document.head.appendChild(script);
   }, [apiKey, onPlaceSelected]);
@@ -112,7 +114,7 @@ export function PlaceAutocomplete({
       <input
         ref={inputRef}
         className="border border-black/15 bg-white px-3 py-2 outline-none focus:border-black"
-        placeholder="Start typing a NYC restaurant"
+        placeholder="Search NYC restaurants"
         type="search"
       />
       <span className="font-mono text-[11px] uppercase text-black/45">{status}</span>
