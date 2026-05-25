@@ -13,6 +13,7 @@ type PlaceValue = {
 
 declare global {
   interface Window {
+    __swallowThisInitPlaces?: () => void;
     google?: {
       maps?: {
         places?: {
@@ -56,10 +57,12 @@ export function PlaceAutocomplete({
     if (!apiKey || !inputRef.current) return;
 
     const existing = document.querySelector<HTMLScriptElement>("script[data-google-places]");
+    let autocomplete: { addListener: (eventName: string, callback: () => void) => void } | null = null;
     const attach = () => {
       if (!window.google?.maps?.places || !inputRef.current) return;
+      if (autocomplete) return;
 
-      const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
+      autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
         fields: ["place_id", "name", "formatted_address", "geometry", "url"],
         bounds: new window.google.maps.LatLngBounds(
           new window.google.maps.LatLng(40.4774, -74.2591),
@@ -99,13 +102,20 @@ export function PlaceAutocomplete({
       return () => existing.removeEventListener("load", attach);
     }
 
+    window.__swallowThisInitPlaces = attach;
     const script = document.createElement("script");
     script.dataset.googlePlaces = "true";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=__swallowThisInitPlaces`;
     script.async = true;
+    script.defer = true;
     script.onerror = () => setStatus("Google Places failed to load");
-    script.onload = attach;
     document.head.appendChild(script);
+
+    return () => {
+      if (window.__swallowThisInitPlaces === attach) {
+        delete window.__swallowThisInitPlaces;
+      }
+    };
   }, [apiKey, onPlaceSelected]);
 
   return (
