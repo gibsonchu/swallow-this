@@ -11,6 +11,22 @@ type PlaceValue = {
   google_maps_url: string;
 };
 
+type GoogleAutocomplete = {
+  addListener: (eventName: string, callback: () => void) => void;
+  getPlace: () => {
+    place_id?: string;
+    name?: string;
+    formatted_address?: string;
+    url?: string;
+    geometry?: {
+      location?: {
+        lat?: () => number;
+        lng?: () => number;
+      };
+    };
+  };
+};
+
 declare global {
   interface Window {
     __swallowThisInitPlaces?: () => void;
@@ -20,21 +36,7 @@ declare global {
           Autocomplete: new (
             input: HTMLInputElement,
             options: Record<string, unknown>,
-          ) => {
-            addListener: (eventName: string, callback: () => void) => void;
-            getPlace: () => {
-              place_id?: string;
-              name?: string;
-              formatted_address?: string;
-              url?: string;
-              geometry?: {
-                location?: {
-                  lat?: () => number;
-                  lng?: () => number;
-                };
-              };
-            };
-          };
+          ) => GoogleAutocomplete;
         };
         LatLng: new (lat: number, lng: number) => unknown;
         LatLngBounds: new (southWest: unknown, northEast: unknown) => unknown;
@@ -57,7 +59,7 @@ export function PlaceAutocomplete({
     if (!apiKey || !inputRef.current) return;
 
     const existing = document.querySelector<HTMLScriptElement>("script[data-google-places]");
-    let autocomplete: { addListener: (eventName: string, callback: () => void) => void } | null = null;
+    let autocomplete: GoogleAutocomplete | null = null;
     const attach = () => {
       if (!window.google?.maps?.places || !inputRef.current) return;
       if (autocomplete) return;
@@ -73,8 +75,9 @@ export function PlaceAutocomplete({
         types: ["establishment"],
       });
 
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
+      const nextAutocomplete = autocomplete;
+      nextAutocomplete.addListener("place_changed", () => {
+        const place = nextAutocomplete.getPlace();
         const lat = place.geometry?.location?.lat?.();
         const lng = place.geometry?.location?.lng?.();
 
