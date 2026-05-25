@@ -1,0 +1,94 @@
+import type { SignRecord } from "@/types/sign";
+
+const svg = (title: string, bg: string, fg = "#151515") =>
+  `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100">
+  <rect width="900" height="1100" fill="${bg}"/>
+  <rect x="58" y="56" width="784" height="988" fill="none" stroke="${fg}" stroke-width="18"/>
+  <circle cx="450" cy="286" r="126" fill="none" stroke="${fg}" stroke-width="30"/>
+  <path d="M330 546h240M364 642h172M396 738h108" stroke="${fg}" stroke-width="44" stroke-linecap="square"/>
+  <text x="450" y="940" text-anchor="middle" font-family="Arial, sans-serif" font-size="70" font-weight="700" fill="${fg}">${title}</text>
+</svg>`)}`;
+
+export const mockSigns: SignRecord[] = [
+  {
+    id: "mock-1",
+    image_original_url: svg("NO GRAPES", "#f7f1df"),
+    image_processed_url: svg("NO GRAPES", "#fffaf0"),
+    sign_title: "Grapes Quartered Upon Request",
+    restaurant_name: "Canal Snack Counter",
+    place_id: "",
+    formatted_address: "Canal St, New York, NY",
+    latitude: "40.718",
+    longitude: "-74.000",
+    google_maps_url: "https://www.google.com/maps/search/?api=1&query=Canal%20St%20New%20York",
+    borough: "Manhattan",
+    neighborhood: "Chinatown",
+    notes: "Laminated warning taped beside a register.",
+    tags: "laminated,counter,fruit",
+    date_collected: "2026-05-01",
+    created_at: "2026-05-01T12:00:00.000Z",
+    updated_at: "2026-05-01T12:00:00.000Z",
+    published: true,
+  },
+  {
+    id: "mock-2",
+    image_original_url: svg("CHEW FIRST", "#e8e2d2"),
+    image_processed_url: "",
+    sign_title: "Chew First",
+    restaurant_name: "Queens Dumpling Window",
+    place_id: "",
+    formatted_address: "Flushing, Queens, NY",
+    latitude: "40.759",
+    longitude: "-73.830",
+    google_maps_url: "https://www.google.com/maps/search/?api=1&query=Flushing%20Queens",
+    borough: "Queens",
+    neighborhood: "Flushing",
+    notes: "A small handwritten sign near the condiment station.",
+    tags: "handwritten,dumplings",
+    date_collected: "2026-04-22",
+    created_at: "2026-04-22T12:00:00.000Z",
+    updated_at: "2026-04-22T12:00:00.000Z",
+    published: true,
+  },
+  {
+    id: "mock-3",
+    image_original_url: svg("HOT DOGS", "#f2eee7"),
+    image_processed_url: svg("HOT DOGS", "#fffaf0"),
+    sign_title: "Hot Dogs Are Cylinders",
+    restaurant_name: "Boardwalk Cart",
+    place_id: "",
+    formatted_address: "Coney Island, Brooklyn, NY",
+    latitude: "40.574",
+    longitude: "-73.985",
+    google_maps_url: "https://www.google.com/maps/search/?api=1&query=Coney%20Island%20Brooklyn",
+    borough: "Brooklyn",
+    neighborhood: "Coney Island",
+    notes: "Food safety sign sun-faded into near-abstraction.",
+    tags: "cart,hot-dog,weathered",
+    date_collected: "2026-03-12",
+    created_at: "2026-03-12T12:00:00.000Z",
+    updated_at: "2026-03-12T12:00:00.000Z",
+    published: true,
+  },
+  {
+    id: "mock-4",
+    image_original_url: svg("CAUTION", "#d8d3c6"),
+    image_processed_url: "",
+    sign_title: "Caution: Small Things",
+    restaurant_name: "Late Night Deli",
+    place_id: "",
+    formatted_address: "Bushwick, Brooklyn, NY",
+    latitude: "40.694",
+    longitude: "-73.922",
+    google_maps_url: "https://www.google.com/maps/search/?api=1&query=Bushwick%20Brooklyn",
+    borough: "Brooklyn",
+    neighborhood: "Bushwick",
+    notes: "A generic warning made specific by placement beside candy.",
+    tags: "deli,candy,generic",
+    date_collected: "2026-02-08",
+    created_at: "2026-02-08T12:00:00.000Z",
+    updated_at: "2026-02-08T12:00:00.000Z",
+    published: true,
+  },
+];
