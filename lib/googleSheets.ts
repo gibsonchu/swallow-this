@@ -125,7 +125,7 @@ export async function listSigns(options: { publishedOnly?: boolean } = {}) {
 
   try {
     const response = await sheetsFetch(
-      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:R")`,
+      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:R")}`,
     );
     if (!response) return fallback;
 
