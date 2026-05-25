@@ -117,18 +117,25 @@ function signToRow(sign: SignRecord) {
 }
 
 export async function listSigns(options: { publishedOnly?: boolean } = {}) {
+  const fallback = options.publishedOnly ? mockSigns.filter((sign) => sign.published) : mockSigns;
+
   if (!hasSheetsEnv()) {
-    return options.publishedOnly ? mockSigns.filter((sign) => sign.published) : mockSigns;
+    return fallback;
   }
 
-  const response = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:R")}`,
-  );
-  if (!response) return options.publishedOnly ? mockSigns.filter((sign) => sign.published) : mockSigns;
+  try {
+    const response = await sheetsFetch(
+      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:R")`,
+    );
+    if (!response) return fallback;
 
-  const data = (await response.json()) as { values?: string[][] };
-  const signs = (data.values ?? []).map(rowToSign);
-  return options.publishedOnly ? signs.filter((sign) => sign.published) : signs;
+    const data = (await response.json()) as { values?: string[][] };
+    const signs = (data.values ?? []).map(rowToSign);
+    return options.publishedOnly ? signs.filter((sign) => sign.published) : signs;
+  } catch (error) {
+    console.warn("Google Sheets read failed; using mock signs.", error);
+    return fallback;
+  }
 }
 
 export async function getSignById(id: string) {
