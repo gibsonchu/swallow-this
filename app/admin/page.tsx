@@ -15,7 +15,7 @@ export default async function AdminPage() {
           method="post"
         >
           <div>
-            <h1 className="text-2xl font-semibold">Swallow This admin</h1>
+            <h1 className="text-2xl font-semibold">Choking Hazard Signs admin</h1>
             <p className="mt-1 text-sm text-black/55">Enter the archive password.</p>
           </div>
           <label className="grid gap-1 text-sm">
@@ -34,7 +34,7 @@ export default async function AdminPage() {
     <main className="min-h-screen bg-[#fbf7ee] px-4 py-5 text-[#151515] md:px-6">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
         <div>
-          <h1 className="text-3xl font-semibold">Swallow This admin</h1>
+          <h1 className="text-3xl font-semibold">Choking Hazard Signs admin</h1>
           <p className="mt-1 text-sm text-black/60">Upload, cut out, annotate, and publish signs.</p>
         </div>
         <form action="/api/admin/logout" method="post">

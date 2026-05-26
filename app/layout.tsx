@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Swallow This",
+  title: "Choking Hazard Signs",
   description: "An archive of choking hazard signs around New York City.",
 };
 

@@ -1,6 +1,6 @@
-# Swallow This
+# Choking Hazard Signs
 
-A minimal public archive of choking hazard signs collected around New York City. Built with Next.js App Router, TypeScript, Tailwind CSS, Google Sheets, Vercel Blob, Google Maps Places Autocomplete, and optional remove.bg background removal.
+A minimal public archive of choking hazard signs collected around New York City. Built with Next.js App Router, TypeScript, Tailwind CSS, Google Sheets, Vercel Blob, and Google Maps Places Autocomplete.
 
 ## Local setup
 
@@ -47,7 +47,7 @@ Add this exact header row in row 1:
 id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited
 ```
 
-The app reads and appends rows on the `Signs` tab. Address, borough, neighborhood, and the legacy sign title column are kept as hidden compatibility fields; the admin uses restaurant, place search, designer, notes, tags, date visited, and published.
+The app reads rows on the `Signs` tab and writes new signs to explicit rows. Address, neighborhood, and the legacy sign title column are kept as hidden compatibility fields; the admin uses restaurant, place search, borough, designer, notes, tags, date visited, and published.
 
 ## Google service account
 
@@ -69,8 +69,6 @@ The app reads and appends rows on the `Signs` tab. Address, borough, neighborhoo
 - `GOOGLE_SHEET_ID`: Spreadsheet ID for the `Signs` sheet.
 - `GOOGLE_MAPS_API_KEY`: Used by the admin Places Autocomplete box. Restrict this key to your deployed/admin domains in Google Cloud.
 - `BLOB_READ_WRITE_TOKEN`: Vercel Blob token for persistent public image storage.
-- `REMOVE_BG_API_KEY`: remove.bg API key. If absent or failing, the admin can save the original image.
-
 ## Routes
 
 - `/`: Public archive, published signs only.
@@ -78,6 +76,5 @@ The app reads and appends rows on the `Signs` tab. Address, borough, neighborhoo
 - `/admin`: Password-gated admin upload and metadata dashboard.
 - `/api/signs`: `GET` published signs, `GET ?all=1` all signs, authenticated `POST` create sign.
 - `/api/upload`: Authenticated image upload.
-- `/api/remove-background`: Authenticated background removal and processed image upload.
 - `/api/admin/login`: Admin login.
 - `/api/admin/logout`: Admin logout.

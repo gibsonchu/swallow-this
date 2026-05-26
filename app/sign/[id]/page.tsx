@@ -43,6 +43,7 @@ export default async function SignDetailPage({
           <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
             {[
               ["Designer", sign.designer],
+              ["Borough", sign.borough],
               ["Date visited", dateVisited],
             ].map(([label, value]) => (
               <div key={label} className="grid grid-cols-[130px_1fr] bg-white">

@@ -78,31 +78,6 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     }
   };
 
-  const runBackgroundRemoval = async () => {
-    if (!file) return;
-    setBusy("Removing background");
-    setMessage("");
-
-    const data = new FormData();
-    data.append("file", file);
-
-    const response = await fetch("/api/remove-background", { method: "POST", body: data });
-    const result = await response.json();
-    setBusy("");
-
-    if (!response.ok) {
-      setMessage(result.error || "Background removal failed. You can still save the original.");
-      return;
-    }
-
-    setUpload((current) => ({
-      originalUrl: current?.originalUrl || result.originalUrl || "",
-      processedUrl: result.url || "",
-      warning: result.warning,
-    }));
-    setMessage(result.warning || "Processed cutout ready.");
-  };
-
   const saveSign = async () => {
     if (!upload?.originalUrl) {
       setMessage("Upload an image before saving.");
@@ -201,15 +176,6 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           )}
         </div>
 
-        <button
-          className="border border-black bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
-          type="button"
-          disabled={!file || disabled}
-          onClick={runBackgroundRemoval}
-        >
-          Run background removal
-        </button>
-
         <BulkUploadQueue items={queue} />
       </section>
 
@@ -228,6 +194,17 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <label className="grid gap-1 text-sm">
             <span className="font-medium">Designer</span>
             <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
+          </label>
+          <label className="grid gap-1 text-sm">
+            <span className="font-medium">Borough</span>
+            <select className="border border-black/15 bg-white px-3 py-2" value={form.borough} onChange={(event) => setField("borough", event.target.value)}>
+              <option value="">Unknown</option>
+              <option value="Manhattan">Manhattan</option>
+              <option value="Brooklyn">Brooklyn</option>
+              <option value="Queens">Queens</option>
+              <option value="Bronx">Bronx</option>
+              <option value="Staten Island">Staten Island</option>
+            </select>
           </label>
           <label className="grid gap-1 text-sm">
             <span className="font-medium">Date visited</span>

@@ -1,4 +1,4 @@
-import { SignGrid } from "@/components/SignGrid";
+import { ArchiveExplorer } from "@/components/ArchiveExplorer";
 import { listSigns } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
@@ -10,14 +10,14 @@ export default async function Home() {
     <main className="min-h-screen bg-[#fbf7ee] text-[#151515]">
       <header className="grid gap-2 border-b border-black/10 px-3 py-4 sm:grid-cols-[1fr_auto] sm:items-end sm:px-5">
         <div>
-          <h1 className="text-3xl font-semibold tracking-normal sm:text-5xl">Swallow This</h1>
+          <h1 className="text-3xl font-semibold tracking-normal sm:text-5xl">Choking Hazard Signs</h1>
           <p className="mt-1 max-w-xl text-sm text-black/65 sm:text-base">
             An archive of choking hazard signs around New York City.
           </p>
         </div>
         <p className="font-mono text-[11px] uppercase text-black/50">{signs.length} published signs</p>
       </header>
-      <SignGrid signs={signs} />
+      <ArchiveExplorer signs={signs} />
     </main>
   );
 }
