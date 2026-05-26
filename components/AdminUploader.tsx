@@ -128,7 +128,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       return;
     }
 
-    setMessage(result.warning || "Saved.");
+    setMessage(result.warning || `Saved to Google Sheets${result.sign?.id ? `: ${result.sign.id}` : "."}`);
     setForm(initialForm);
     setUpload(null);
     setFile(null);
@@ -251,11 +251,15 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         <button
           className="border border-black bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
           type="button"
-          disabled={disabled}
+          disabled={!upload?.originalUrl || disabled}
           onClick={saveSign}
         >
           Save sign
         </button>
+
+        {!upload?.originalUrl && !busy && (
+          <p className="font-mono text-xs uppercase text-black/45">Upload an image before saving.</p>
+        )}
 
         {(busy || message || upload?.warning) && (
           <p className="font-mono text-xs uppercase text-black/55">{busy || message || upload?.warning}</p>
