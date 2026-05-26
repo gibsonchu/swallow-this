@@ -31,8 +31,10 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
   const mapRef = useRef<Leaflet.Map | null>(null);
   const leafletRef = useRef<typeof Leaflet | null>(null);
   const markerRefs = useRef<Record<string, Leaflet.Marker>>({});
+  const sidebarItemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const [mapReady, setMapReady] = useState(false);
   const [modalIndex, setModalIndex] = useState<number | null>(null);
+  const [selectedSignId, setSelectedSignId] = useState<string | null>(null);
   const mappedSigns = useMemo(
     () =>
       [...signs]
@@ -58,9 +60,9 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
         scrollWheelZoom: true,
       });
 
-      leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      leaflet.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
         maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
       }).addTo(map);
 
       leafletRef.current = leaflet;
@@ -89,7 +91,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
 
     const bounds: [number, number][] = [];
 
-    mappedSigns.forEach(({ sign, lat, lng }) => {
+    mappedSigns.forEach(({ sign, lat, lng }, position) => {
       const imageUrl = sign.image_processed_url || sign.image_original_url;
       const restaurant = escapeHtml(sign.restaurant_name || "Unknown Restaurant");
       const addressHtml = sign.formatted_address
@@ -99,20 +101,21 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
       const icon = leaflet.divIcon({
         className: "",
         html: `
-          <div class="grid h-[72px] w-[72px] place-items-center rounded-full border border-black bg-white shadow-sm">
-            <img src="${escapeHtml(imageUrl)}" alt="" class="archive-image h-14 w-14 rounded-full object-cover object-center" />
+          <div class="grid h-9 w-9 place-items-center rounded-full border border-black bg-[#fdfdf9] font-mono text-[12px] text-black shadow-sm">
+            ${position + 1}
           </div>
         `,
-        iconSize: [72, 72],
-        iconAnchor: [36, 36],
-        popupAnchor: [0, -38],
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+        popupAnchor: [0, -22],
       });
 
       const marker = leaflet.marker([lat, lng], { icon })
         .addTo(map)
         .bindPopup(
           `
-          <div class="w-56 text-sm leading-tight">
+          <div class="w-60 text-sm leading-tight">
+            <img src="${escapeHtml(imageUrl)}" alt="" class="archive-image mb-3 h-28 w-full bg-white object-contain object-center" />
             <span class="block font-semibold">${restaurant}</span>
             ${addressHtml}
             <button class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" type="button" data-sign-modal-index="${index}">View Sign</button>
@@ -121,6 +124,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           { className: "sign-map-popup" },
         );
       marker.on("click", () => {
+        setSelectedSignId(sign.id);
         map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
       });
       markerRefs.current[sign.id] = marker;
@@ -131,6 +135,11 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
       map.fitBounds(bounds, { padding: [70, 70], maxZoom: 15 });
     }
   }, [mapReady, mappedSigns]);
+
+  useEffect(() => {
+    if (!selectedSignId) return;
+    sidebarItemRefs.current[selectedSignId]?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [selectedSignId]);
 
   useEffect(() => {
     const element = mapElementRef.current;
@@ -151,6 +160,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     const map = mapRef.current;
     const marker = markerRefs.current[sign.id];
     if (!map || !marker) return;
+    setSelectedSignId(sign.id);
     map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
     marker.openPopup();
   };
@@ -162,7 +172,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
   return (
     <section className="h-full bg-[#fdfdf9]">
       <div className="grid h-full gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="relative min-h-[calc(100vh-82px)] border-b border-black/10 lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[60vh] border-b border-black/10 lg:min-h-[calc(100vh-82px)] lg:border-b-0 lg:border-r">
           <div ref={mapElementRef} className="absolute inset-0" />
           {mappedSigns.length === 0 && (
             <div className="absolute inset-0 z-[500] grid place-items-center bg-[#fdfdf9]/80 p-6 text-center text-sm text-black/45">
@@ -177,8 +187,18 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           </div>
           <div className="divide-y divide-black/10">
             {mappedSigns.map(({ sign }, index) => (
-              <button key={sign.id} type="button" onClick={() => focusSign(sign)} className="grid w-full grid-cols-[34px_1fr] gap-4 p-4 text-left text-sm hover:bg-white">
-                <span className="font-mono text-[11px] text-black/45">{String(index + 1).padStart(2, "0")}</span>
+              <button
+                key={sign.id}
+                ref={(element) => {
+                  sidebarItemRefs.current[sign.id] = element;
+                }}
+                type="button"
+                onClick={() => focusSign(sign)}
+                className={`grid w-full grid-cols-[34px_1fr] gap-4 p-4 text-left text-sm ${selectedSignId === sign.id ? "bg-white" : "hover:bg-white"}`}
+              >
+                <span className={`font-mono text-[11px] ${selectedSignId === sign.id ? "text-black" : "text-black/45"}`}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <span>
                   <span className="block font-medium">{sign.restaurant_name || "Unknown Restaurant"}</span>
                   <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">

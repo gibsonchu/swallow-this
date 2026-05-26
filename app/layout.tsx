@@ -38,6 +38,9 @@ export default function RootLayout({
       <body className="min-h-full antialiased">
         {children}
         <footer className="border-t border-black/10 bg-[#fdfdf9] px-5 py-5 font-mono text-[11px] text-black/45 md:px-10">
+          <p className="mb-4 max-w-sm leading-5">
+            An index of choking hazard signs around New York City.
+          </p>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span>Last Updated May 26, 2026</span>
             <span>

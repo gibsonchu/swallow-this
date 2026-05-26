@@ -71,15 +71,12 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
   return (
     <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
-      <aside className="border-b border-black/10 p-6 md:sticky md:top-0 md:h-screen md:border-b-0 md:p-10">
-        <h1 className="display-title max-w-[13rem] text-[2rem] leading-[0.9] tracking-normal md:text-[2.55rem]">
+      <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-screen md:border-b-0 md:p-10">
+        <h1 className="display-title max-w-[15rem] text-[2rem] leading-[0.9] tracking-normal md:max-w-[13rem] md:text-[2.55rem]">
           Choking Hazard Signs
         </h1>
-        <p className="mt-5 max-w-[14rem] text-sm leading-6 text-black/55">
-          An index of choking hazard signs around New York City.
-        </p>
 
-        <nav className="mt-11 grid gap-9">
+        <nav className="mt-8 grid gap-6 md:mt-11 md:gap-9">
           <label className="grid gap-2">
             <span className="font-mono text-[11px] uppercase text-black/40">Search</span>
             <input
@@ -93,65 +90,73 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
           <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
 
-          <div className="grid gap-1">
+          <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Borough</p>
-            {boroughs.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`w-fit text-left text-lg leading-tight ${
-                  item === borough ? "font-semibold text-black" : "font-semibold text-black/45 hover:text-black"
-                }`}
-                onClick={() => setBorough(item)}
-              >
-                {item}
-              </button>
-            ))}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
+              {boroughs.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={`w-fit text-left text-lg leading-tight ${
+                    item === borough ? "font-semibold text-black" : "font-semibold text-black/45 hover:text-black"
+                  }`}
+                  onClick={() => setBorough(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="grid gap-1">
+          <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">View By</p>
-            {(["icons", "gallery"] as ViewMode[]).map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`w-fit text-left text-lg font-semibold capitalize leading-tight ${viewMode === item ? "text-black" : "text-black/45 hover:text-black"}`}
-                onClick={() => setViewMode(item)}
-              >
-                {item}
-              </button>
-            ))}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
+              {(["icons", "gallery"] as ViewMode[]).map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={`w-fit text-left text-lg font-semibold capitalize leading-tight ${viewMode === item ? "text-black" : "text-black/45 hover:text-black"}`}
+                  onClick={() => setViewMode(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="grid gap-1">
+          <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Sort</p>
-            {[
-              ["featured", "Featured"],
-              ["az", "A-Z"],
-              ["recent", "Recent"],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                className={`w-fit text-left text-lg font-semibold leading-tight ${sortMode === value ? "text-black" : "text-black/45 hover:text-black"}`}
-                onClick={() => {
-                  setSortMode(value as SortMode);
-                  setGalleryIndex(0);
-                }}
-              >
-                {label}
-              </button>
-            ))}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
+              {[
+                ["featured", "Featured"],
+                ["az", "A-Z"],
+                ["recent", "Recent"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`w-fit text-left text-lg font-semibold leading-tight ${sortMode === value ? "text-black" : "text-black/45 hover:text-black"}`}
+                  onClick={() => {
+                    setSortMode(value as SortMode);
+                    setGalleryIndex(0);
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="grid gap-1">
+          <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Pages</p>
-            <span className="text-lg font-semibold text-black">Index</span>
-            <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">Map</Link>
-            <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/about">About</Link>
-            <Link className="mt-3 w-fit border border-black bg-black px-4 py-2 text-lg font-semibold leading-tight text-white hover:bg-white hover:text-black" href="/submit">
-              Submit A Sign
-            </Link>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:grid md:gap-1">
+              <span className="text-lg font-semibold text-black">Index</span>
+              <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">Map</Link>
+              <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/about">About</Link>
+              <Link className="w-fit border border-black bg-black px-4 py-2 text-lg font-semibold leading-tight text-white hover:bg-white hover:text-black md:mt-3" href="/submit">
+                Submit A Sign
+              </Link>
+            </div>
           </div>
         </nav>
       </aside>

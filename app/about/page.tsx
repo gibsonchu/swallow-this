@@ -21,7 +21,7 @@ export default function AboutPage() {
         Header Image Placeholder
       </div>
 
-      <article className="mx-auto max-w-3xl text-[19px] leading-8 text-black/80">
+      <article className="mx-auto mb-24 max-w-3xl text-[19px] leading-8 text-black/80 md:mb-36">
         <p className="font-mono text-xs uppercase leading-5 text-black/45">
           A public index of choking hazard signs collected around New York City.
         </p>

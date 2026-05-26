@@ -40,15 +40,15 @@ export function SignModal({
   return (
     <div className="fixed inset-0 z-[1000] bg-[#fdfdf9]/70 backdrop-blur-md" role="dialog" aria-modal="true">
       <button className="absolute inset-0 cursor-default" type="button" aria-label="Close" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 grid max-h-[88vh] min-h-[min(720px,88vh)] w-[min(980px,92vw)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-auto border border-black/10 bg-[#fdfdf9] p-5 shadow-sm md:grid-cols-[minmax(0,1fr)_330px]">
-        <button className="absolute right-3 top-3 font-mono text-[11px] uppercase text-black/45 hover:text-black" type="button" onClick={onClose}>
+      <div className="absolute left-1/2 top-1/2 grid max-h-[92vh] min-h-[min(720px,88vh)] w-[min(980px,94vw)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-auto border border-black/10 bg-[#fdfdf9] p-4 pt-12 shadow-sm sm:p-5 sm:pt-12 md:grid-cols-[minmax(0,1fr)_330px] md:pt-5">
+        <button className="absolute right-4 top-4 px-2 py-1 font-mono text-[11px] uppercase text-black/45 hover:text-black" type="button" onClick={onClose}>
           Close
         </button>
-        <div className="grid min-h-[340px] place-items-center bg-white">
+        <div className="grid min-h-[260px] place-items-center bg-white sm:min-h-[340px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={imageFor(sign)} alt={sign.restaurant_name || "Choking hazard sign"} className="archive-image max-h-[72vh] w-full object-contain object-center p-3" />
         </div>
-        <section className="flex min-h-[520px] flex-col gap-4 pr-6 md:pr-0">
+        <section className="flex min-h-[460px] flex-col gap-4 md:min-h-[520px] md:pr-0">
           <div>
             <p className="font-mono text-[11px] uppercase text-black/45">
               {index + 1} / {total}
@@ -57,8 +57,8 @@ export function SignModal({
           </div>
           <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
             {metadata.map(([label, value]) => (
-              <div key={label} className="grid grid-cols-[118px_1fr] bg-white">
-                <dt className="border-r border-black/10 p-2 font-mono text-[10px] uppercase text-black/45">{label}</dt>
+              <div key={label} className="grid bg-white sm:grid-cols-[118px_1fr]">
+                <dt className="border-b border-black/10 p-2 font-mono text-[10px] uppercase text-black/45 sm:border-b-0 sm:border-r">{label}</dt>
                 <dd className="whitespace-pre-line p-2">
                   {label === "Address" && sign.google_maps_url && value ? (
                     <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
