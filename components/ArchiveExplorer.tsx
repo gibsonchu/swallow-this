@@ -126,7 +126,15 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
           </Link>
         )}
 
-        <SignGrid signs={gridSigns} />
+        {gridSigns.length > 0 ? (
+          <SignGrid signs={gridSigns} />
+        ) : (
+          <div className="border border-black/10 px-4 py-12 text-center text-sm text-black/60">
+            {featured && !query.trim() && borough === "All"
+              ? "More signs will appear here as the archive grows."
+              : "No signs match this search."}
+          </div>
+        )}
       </section>
     </div>
   );
