@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { SignRecord } from "@/types/sign";
 
 function imageFor(sign: SignRecord) {
@@ -37,6 +38,26 @@ export function SignModal({
       : []),
   ];
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        onPrev();
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        onNext();
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, onNext, onPrev]);
+
   return (
     <div className="fixed inset-0 z-[1000] bg-[#fdfdf9]/70 backdrop-blur-md" role="dialog" aria-modal="true">
       <button className="absolute inset-0 cursor-default" type="button" aria-label="Close" onClick={onClose} />
@@ -47,6 +68,17 @@ export function SignModal({
         <div className="grid min-h-[260px] place-items-center bg-white sm:min-h-[340px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={imageFor(sign)} alt={sign.restaurant_name || "Choking hazard sign"} className="archive-image max-h-[72vh] w-full object-contain object-center p-3" />
+        </div>
+        <div className="flex items-center justify-between gap-3 font-mono text-[11px] uppercase text-black/45 md:hidden">
+          <button type="button" className="px-2 py-2 hover:text-black" onClick={onPrev}>
+            ← Prev
+          </button>
+          <span>
+            {index + 1} / {total}
+          </span>
+          <button type="button" className="px-2 py-2 hover:text-black" onClick={onNext}>
+            Next →
+          </button>
         </div>
         <section className="flex min-h-[460px] flex-col gap-4 md:min-h-[520px] md:pr-0">
           <div>
@@ -88,7 +120,7 @@ export function SignModal({
               <p className="text-sm leading-6 text-black/75">{sign.notes}</p>
             </section>
           )}
-          <div className="mt-auto flex items-center justify-between gap-3 border-t border-black/10 pt-4 font-mono text-[11px] uppercase text-black/45">
+          <div className="mt-auto hidden items-center justify-between gap-3 border-t border-black/10 pt-4 font-mono text-[11px] uppercase text-black/45 md:flex">
             <button type="button" className="hover:text-black" onClick={onPrev}>
               ← Prev
             </button>

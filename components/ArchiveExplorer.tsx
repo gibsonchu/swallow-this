@@ -1,22 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { SignGrid } from "@/components/SignGrid";
 import { SignModal } from "@/components/SignModal";
 import type { SignRecord } from "@/types/sign";
 
-const BOROUGH_ORDER = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "New Jersey", "Unknown"];
 type ViewMode = "icons" | "gallery";
 type SortMode = "featured" | "az" | "recent";
-
-function boroughFor(sign: SignRecord) {
-  return sign.borough || "Unknown";
-}
-
-function searchableText(sign: SignRecord) {
-  return sign.restaurant_name.toLowerCase();
-}
 
 function sortValue(sign: SignRecord) {
   const value = Number(sign.sort_order);
@@ -29,37 +20,19 @@ function dateValue(sign: SignRecord) {
 }
 
 export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
-  const [borough, setBorough] = useState("All");
-  const [query, setQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("icons");
   const [sortMode, setSortMode] = useState<SortMode>("featured");
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [modalIndex, setModalIndex] = useState<number | null>(null);
 
-  const boroughs = useMemo(() => {
-    const available = new Set(signs.map(boroughFor));
-    return ["All", ...BOROUGH_ORDER.filter((item) => available.has(item))];
-  }, [signs]);
-
   const filteredSigns = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    const filtered = signs.filter((sign) => {
-      const matchesBorough = borough === "All" || boroughFor(sign) === borough;
-      const matchesQuery =
-        !normalizedQuery ||
-        normalizedQuery
-          .split(/\s+/)
-          .every((term) => searchableText(sign).includes(term));
-      return matchesBorough && matchesQuery;
-    });
-
-    return filtered.sort((a, b) => {
+    return [...signs].sort((a, b) => {
       if (sortMode === "az") return (a.restaurant_name || "").localeCompare(b.restaurant_name || "");
       if (sortMode === "recent") return dateValue(b) - dateValue(a);
       const byOrder = sortValue(a) - sortValue(b);
       return byOrder || (a.restaurant_name || "").localeCompare(b.restaurant_name || "");
     });
-  }, [borough, query, signs, sortMode]);
+  }, [signs, sortMode]);
 
   const safeGalleryIndex = Math.min(galleryIndex, Math.max(filteredSigns.length - 1, 0));
   const selectedGallerySign = filteredSigns[safeGalleryIndex] || filteredSigns[0];
@@ -69,6 +42,30 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   const prevIndex = (index: number) => (index - 1 + filteredSigns.length) % filteredSigns.length;
   const nextIndex = (index: number) => (index + 1) % filteredSigns.length;
 
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      window.requestAnimationFrame(() => setViewMode("gallery"));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (modalIndex !== null || viewMode !== "gallery" || filteredSigns.length === 0) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setGalleryIndex((index) => (index - 1 + filteredSigns.length) % filteredSigns.length);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setGalleryIndex((index) => (index + 1) % filteredSigns.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [filteredSigns.length, modalIndex, viewMode]);
+
   return (
     <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
       <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-screen md:border-b-0 md:p-10">
@@ -77,36 +74,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
         </h1>
 
         <nav className="mt-8 grid gap-6 md:mt-11 md:gap-9">
-          <label className="grid gap-2">
-            <span className="font-mono text-[11px] uppercase text-black/40">Search</span>
-            <input
-              className="w-full border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black"
-              placeholder="Restaurant name"
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </label>
-
           <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
-
-          <div>
-            <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Borough</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
-              {boroughs.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`w-fit text-left text-lg leading-tight ${
-                    item === borough ? "font-semibold text-black" : "font-semibold text-black/45 hover:text-black"
-                  }`}
-                  onClick={() => setBorough(item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">View By</p>

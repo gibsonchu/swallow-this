@@ -121,7 +121,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
             <button class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" type="button" data-sign-modal-index="${index}">View Sign</button>
           </div>
         `,
-          { className: "sign-map-popup" },
+          { autoPan: false, className: "sign-map-popup" },
         );
       marker.on("click", () => {
         setSelectedSignId(sign.id);
@@ -161,8 +161,12 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     const marker = markerRefs.current[sign.id];
     if (!map || !marker) return;
     setSelectedSignId(sign.id);
-    map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
-    marker.openPopup();
+    const targetZoom = Math.max(map.getZoom(), 15);
+    map.setView(marker.getLatLng(), targetZoom, { animate: true });
+    window.setTimeout(() => {
+      map.setView(marker.getLatLng(), targetZoom, { animate: false });
+      marker.openPopup();
+    }, 260);
   };
 
   const prevIndex = (index: number) => (index - 1 + mappedSigns.length) % mappedSigns.length;

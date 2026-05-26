@@ -408,7 +408,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       </section>
 
       <section className="max-h-[78vh] overflow-auto border border-black/10 bg-white">
-        <div className="sticky top-0 border-b border-black/10 bg-white">
+        <div className="sticky top-0 z-20 border-b border-black/10 bg-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
           <div className="grid grid-cols-2">
             <button
               className={`border-r border-black/10 p-3 text-left font-mono text-[11px] uppercase ${tab === "archive" ? "text-black" : "text-black/40"}`}
