@@ -132,7 +132,9 @@ export async function listSigns(options: { publishedOnly?: boolean } = {}) {
     const data = (await response.json()) as { values?: string[][] };
     const rows = data.values ?? [];
     const dataRows = rows[0]?.[0] === "id" ? rows.slice(1) : rows;
-    const signs = dataRows.map(rowToSign);
+    const signs = dataRows
+      .map(rowToSign)
+      .filter((sign) => sign.id || sign.image_original_url || sign.restaurant_name);
     return options.publishedOnly ? signs.filter((sign) => sign.published) : signs;
   } catch (error) {
     console.warn("Google Sheets read failed; using mock signs.", error);
@@ -160,15 +162,24 @@ export async function createSign(input: SignInput) {
     return { sign, stored: false, warning: "Google Sheets env vars are missing; returning mock save." };
   }
 
-  await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}:append?valueInputOption=USER_ENTERED`,
+  const rowsResponse = await sheetsFetch(
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}`,
+  );
+  const rowsData = rowsResponse ? ((await rowsResponse.json()) as { values?: string[][] }) : { values: [] };
+  const nextRowNumber = (rowsData.values ?? []).length + 1;
+
+  const writeResponse = await sheetsFetch(
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(
+      `Signs!A${nextRowNumber}:T${nextRowNumber}`,
+    )}?valueInputOption=USER_ENTERED`,
     {
-      method: "POST",
+      method: "PUT",
       body: JSON.stringify({
         values: [signToRow(sign)],
       }),
     },
   );
+  const writeData = writeResponse ? ((await writeResponse.json()) as { updatedRange?: string }) : {};
 
-  return { sign, stored: true };
+  return { sign, stored: true, updatedRange: writeData.updatedRange };
 }
