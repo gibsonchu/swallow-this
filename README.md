@@ -44,10 +44,10 @@ Create a Google Sheet with a tab named `Signs`.
 Add this exact header row in row 1:
 
 ```text
-id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,restaurant_website_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at,designer_url,usability_rating
+id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,restaurant_website_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at,designer_url,usability_rating,submitter_name,featured
 ```
 
-The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin and public submission flow focus on restaurant, place search, website links, borough, neighborhood, designer, usability rating, usability reasoning, tags, date visited, published, `status`, and `submitted_at`. Public submissions are saved as `status=pending` and `published=FALSE`.
+The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin and public submission flow focus on restaurant, place search, website links, borough, neighborhood, designer, usability rating, usability reasoning, tags, date visited, submitter name, featured status, published, `status`, and `submitted_at`. Public submissions are saved as `status=pending` and `published=FALSE`.
 
 ## Google service account
 
@@ -67,7 +67,8 @@ The app reads rows on the `Signs` tab and writes new signs to explicit rows. Lat
 - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: Service account email for Sheets access.
 - `GOOGLE_PRIVATE_KEY`: Service account private key.
 - `GOOGLE_SHEET_ID`: Spreadsheet ID for the `Signs` sheet.
-- `GOOGLE_MAPS_API_KEY`: Used in the browser by the admin Places Autocomplete box. Enable Maps JavaScript API and Places API, then add website referrers for local and deployed URLs such as `http://localhost:3000/*` and `https://choking-hazard-signs.vercel.app/*`.
+- `GOOGLE_MAPS_API_KEY`: Legacy/browser Maps key, kept for compatibility.
+- `GOOGLE_PLACES_SERVER_API_KEY`: Server-side Places key used by autocomplete and place details. Enable Places API (New) and keep application restrictions compatible with server-side requests.
 - `BLOB_READ_WRITE_TOKEN`: Vercel Blob token for persistent public image storage.
 ## Routes
 

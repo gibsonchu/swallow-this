@@ -19,6 +19,7 @@ type SubmissionForm = {
   tags: string;
   date_visited: string;
   usability_rating: string;
+  submitter_name: string;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -39,6 +40,7 @@ const initialForm: SubmissionForm = {
   tags: "",
   date_visited: today,
   usability_rating: "",
+  submitter_name: "",
 };
 
 export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string }) {
@@ -126,6 +128,16 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
           <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
         </label>
 
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Submitter Name</span>
+          <input
+            className="border border-black/15 bg-white px-3 py-2"
+            placeholder="Gibson Chu"
+            value={form.submitter_name}
+            onChange={(event) => setField("submitter_name", event.target.value)}
+          />
+        </label>
+
         <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
 
         <label className="grid gap-1 text-sm">
@@ -172,9 +184,9 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
           <span className="font-medium">Usability Rating</span>
           <select className="border border-black/15 bg-white px-3 py-2" value={form.usability_rating} onChange={(event) => setField("usability_rating", event.target.value)}>
             <option value="">Unrated</option>
-            <option value="1">1 - Non-Functional</option>
-            <option value="2">2 - Marginal</option>
-            <option value="3">3 - Usable</option>
+            <option value="1">🌟 Non-Functional</option>
+            <option value="2">🌟🌟 Marginal</option>
+            <option value="3">🌟🌟🌟 Usable</option>
           </select>
         </label>
 

@@ -37,6 +37,8 @@ export const mockSigns: SignRecord[] = [
     status: "approved",
     submitted_at: "",
     usability_rating: "2",
+    submitter_name: "Gibson Chu",
+    featured: true,
   },
   {
     id: "mock-2",
@@ -64,6 +66,8 @@ export const mockSigns: SignRecord[] = [
     status: "approved",
     submitted_at: "",
     usability_rating: "2",
+    submitter_name: "Gibson Chu",
+    featured: false,
   },
   {
     id: "mock-3",
@@ -91,6 +95,8 @@ export const mockSigns: SignRecord[] = [
     status: "approved",
     submitted_at: "",
     usability_rating: "2",
+    submitter_name: "Gibson Chu",
+    featured: false,
   },
   {
     id: "mock-4",
@@ -118,5 +124,7 @@ export const mockSigns: SignRecord[] = [
     status: "approved",
     submitted_at: "",
     usability_rating: "2",
+    submitter_name: "Gibson Chu",
+    featured: false,
   },
 ];

@@ -1,96 +1,143 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { SignRecord } from "@/types/sign";
+import type * as Leaflet from "leaflet";
 
-const NYC_BOUNDS = {
-  north: 40.9176,
-  south: 40.4774,
-  east: -73.7004,
-  west: -74.2591,
-};
-
-function pinPosition(sign: SignRecord) {
+function mappedSign(sign: SignRecord) {
   const lat = Number(sign.latitude);
   const lng = Number(sign.longitude);
-
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { sign, lat, lng };
+}
 
-  const x = ((lng - NYC_BOUNDS.west) / (NYC_BOUNDS.east - NYC_BOUNDS.west)) * 100;
-  const y = ((NYC_BOUNDS.north - lat) / (NYC_BOUNDS.north - NYC_BOUNDS.south)) * 100;
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-  if (x < 0 || x > 100 || y < 0 || y > 100) return null;
-  return { x, y };
+function stars(rating: string) {
+  const count = Number(rating);
+  return Number.isFinite(count) && count > 0 ? "🌟".repeat(Math.min(count, 3)) : "";
 }
 
 export function SignMap({ signs }: { signs: SignRecord[] }) {
-  const mappedSigns = signs
-    .map((sign) => ({ sign, position: pinPosition(sign) }))
-    .filter((item): item is { sign: SignRecord; position: { x: number; y: number } } => Boolean(item.position));
+  const mapElementRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<Leaflet.Map | null>(null);
+  const leafletRef = useRef<typeof Leaflet | null>(null);
+  const [mapReady, setMapReady] = useState(false);
+  const mappedSigns = useMemo(() => signs.map(mappedSign).filter(Boolean) as { sign: SignRecord; lat: number; lng: number }[], [signs]);
+
+  useEffect(() => {
+    if (!mapElementRef.current || mapRef.current) return;
+
+    let cancelled = false;
+
+    void import("leaflet").then((leaflet) => {
+      if (cancelled || !mapElementRef.current || mapRef.current) return;
+
+      const map = leaflet.map(mapElementRef.current, {
+        center: [40.7128, -74.006],
+        zoom: 12,
+        zoomControl: true,
+        attributionControl: true,
+        scrollWheelZoom: true,
+      });
+
+      leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
+
+      leafletRef.current = leaflet;
+      mapRef.current = map;
+      setMapReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+      leafletRef.current = null;
+      setMapReady(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const leaflet = leafletRef.current;
+    if (!mapReady || !map || !leaflet) return;
+
+    map.eachLayer((layer) => {
+      if (layer instanceof leaflet.Marker) map.removeLayer(layer);
+    });
+
+    const bounds: [number, number][] = [];
+
+    mappedSigns.forEach(({ sign, lat, lng }) => {
+      const imageUrl = sign.image_processed_url || sign.image_original_url;
+      const restaurant = escapeHtml(sign.restaurant_name || "Unknown Restaurant");
+      const address = escapeHtml(sign.formatted_address || "Address Pending");
+      const restaurantHref = sign.restaurant_website_url || `/sign/${encodeURIComponent(sign.id)}`;
+      const addressHref = sign.google_maps_url || `/sign/${encodeURIComponent(sign.id)}`;
+      const rating = stars(sign.usability_rating);
+      const icon = leaflet.divIcon({
+        className: "",
+        html: `
+          <div class="grid h-[72px] w-[72px] place-items-center rounded-full border border-black bg-white shadow-sm">
+            <img src="${escapeHtml(imageUrl)}" alt="" class="h-14 w-14 rounded-full object-cover" />
+          </div>
+        `,
+        iconSize: [72, 72],
+        iconAnchor: [36, 36],
+        popupAnchor: [0, -38],
+      });
+
+      leaflet.marker([lat, lng], { icon })
+        .addTo(map)
+        .bindPopup(
+          `
+          <div class="w-56 text-sm leading-tight">
+            <a class="block font-semibold underline-offset-2 hover:underline" href="${escapeHtml(restaurantHref)}" target="${sign.restaurant_website_url ? "_blank" : "_self"}">${restaurant}</a>
+            <a class="mt-2 block text-xs leading-4 text-black/65 underline-offset-2 hover:underline" href="${escapeHtml(addressHref)}" target="_blank">${address}</a>
+            ${rating ? `<p class="mt-2 text-sm">${rating}</p>` : ""}
+            <a class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" href="/sign/${escapeHtml(sign.id)}">View Sign</a>
+          </div>
+        `,
+          { className: "sign-map-popup" },
+        );
+      bounds.push([lat, lng]);
+    });
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [70, 70], maxZoom: 15 });
+    }
+  }, [mapReady, mappedSigns]);
 
   return (
     <section className="h-full bg-[#fdfdf9]">
-      <div className="grid h-full gap-0 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative min-h-[calc(100vh-74px)] overflow-hidden border-b border-black/10 bg-[#f4f4ee] lg:border-b-0 lg:border-r">
-          <div className="absolute inset-0 opacity-80">
-            <div className="absolute left-[16%] top-[12%] h-[78%] w-[22%] rotate-[8deg] border border-black/15 bg-white/60" />
-            <div className="absolute left-[39%] top-[30%] h-[42%] w-[18%] rotate-[-12deg] border border-black/15 bg-white/45" />
-            <div className="absolute left-[55%] top-[18%] h-[60%] w-[26%] rotate-[5deg] border border-black/15 bg-white/45" />
-            <div className="absolute left-[28%] top-[72%] h-[18%] w-[28%] rotate-[-5deg] border border-black/10 bg-white/35" />
-          </div>
-          <div className="absolute left-3 top-3 z-10 font-mono text-[11px] uppercase text-black/50">
-            Approximate NYC map
-          </div>
-          {mappedSigns.map(({ sign, position }, index) => (
-            <div
-              key={sign.id}
-              className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 hover:z-30"
-              style={{ left: `${position.x}%`, top: `${position.y}%` }}
-              title={sign.restaurant_name || `Sign ${index + 1}`}
-            >
-              <span className="grid h-16 w-16 place-items-center rounded-full border border-black bg-white shadow-sm transition group-hover:scale-125">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={sign.image_processed_url || sign.image_original_url}
-                  alt=""
-                  className="h-12 w-12 rounded-full object-contain"
-                />
-              </span>
-              <span className="absolute left-1/2 top-20 hidden w-56 -translate-x-1/2 border border-black bg-white p-2 text-left text-[11px] font-normal leading-tight text-black shadow-sm group-hover:block">
-                {sign.restaurant_website_url ? (
-                  <a className="block font-medium hover:underline" href={sign.restaurant_website_url} target="_blank" rel="noreferrer">
-                    {sign.restaurant_name || "Unknown Restaurant"}
-                  </a>
-                ) : (
-                  <Link className="block font-medium hover:underline" href={`/sign/${sign.id}`}>
-                    {sign.restaurant_name || "Unknown Restaurant"}
-                  </Link>
-                )}
-                {sign.formatted_address && (
-                  <a className="mt-1 block text-black/65 hover:underline" href={sign.google_maps_url || "#"} target="_blank" rel="noreferrer">
-                    {sign.formatted_address}
-                  </a>
-                )}
-                <Link className="mt-2 block font-mono uppercase text-black/45 hover:text-black" href={`/sign/${sign.id}`}>
-                  View Sign
-                </Link>
-              </span>
-            </div>
-          ))}
+      <div className="grid h-full gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="relative min-h-[calc(100vh-82px)] border-b border-black/10 lg:border-b-0 lg:border-r">
+          <div ref={mapElementRef} className="absolute inset-0" />
           {mappedSigns.length === 0 && (
-            <div className="absolute inset-0 grid place-items-center p-6 text-center text-sm text-black/45">
-              Saved signs with latitude and longitude will appear here.
+            <div className="absolute inset-0 z-[500] grid place-items-center bg-[#fdfdf9]/80 p-6 text-center text-sm text-black/45">
+              Saved Signs With Latitude And Longitude Will Appear Here.
             </div>
           )}
         </div>
 
-        <div className="max-h-[calc(100vh-74px)] overflow-auto bg-[#fdfdf9]">
-          <div className="sticky top-0 border-b border-black/10 bg-[#fdfdf9] p-3 font-mono text-[11px] uppercase text-black/50">
+        <div className="max-h-[calc(100vh-82px)] overflow-auto bg-[#fdfdf9]">
+          <div className="sticky top-0 border-b border-black/10 bg-[#fdfdf9] p-4 font-mono text-[11px] uppercase text-black/50">
             {mappedSigns.length} Mapped Signs
           </div>
           <div className="divide-y divide-black/10">
             {mappedSigns.map(({ sign }, index) => (
-              <Link key={sign.id} href={`/sign/${sign.id}`} className="grid grid-cols-[32px_1fr] gap-3 p-3 text-sm hover:bg-white">
+              <Link key={sign.id} href={`/sign/${sign.id}`} className="grid grid-cols-[34px_1fr] gap-4 p-4 text-sm hover:bg-white">
                 <span className="font-mono text-[11px] text-black/45">{String(index + 1).padStart(2, "0")}</span>
                 <span>
                   <span className="block font-medium">{sign.restaurant_name || "Unknown Restaurant"}</span>

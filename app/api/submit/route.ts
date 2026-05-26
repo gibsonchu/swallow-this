@@ -47,6 +47,8 @@ export async function POST(request: Request) {
       status: "pending",
       submitted_at: now,
       usability_rating: text(form, "usability_rating"),
+      submitter_name: text(form, "submitter_name") || "Gibson Chu",
+      featured: false,
     });
 
     return NextResponse.json({

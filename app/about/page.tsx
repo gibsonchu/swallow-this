@@ -6,7 +6,7 @@ export default function AboutPage() {
       <header className="mb-10 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
         <div>
           <p className="font-mono text-[11px] uppercase text-black/45">About</p>
-          <h1 className="mt-1 max-w-3xl text-4xl font-semibold leading-[0.95] md:text-6xl">
+          <h1 className="display-title mt-1 max-w-3xl text-4xl leading-[0.9] md:text-6xl">
             Choking Hazard Signs
           </h1>
         </div>
@@ -16,6 +16,10 @@ export default function AboutPage() {
           <Link className="text-black/45 hover:text-black" href="/submit">Submit</Link>
         </nav>
       </header>
+
+      <div className="mx-auto mb-12 grid aspect-[16/7] max-w-5xl place-items-center border border-black/10 bg-white text-center font-mono text-[11px] uppercase text-black/35">
+        Header Image Placeholder
+      </div>
 
       <article className="mx-auto max-w-3xl text-[19px] leading-8 text-black/80">
         <p className="font-mono text-xs uppercase leading-5 text-black/45">

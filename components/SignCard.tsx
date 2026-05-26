@@ -5,6 +5,7 @@ export function SignCard({ sign }: { sign: SignRecord }) {
   const imageUrl = sign.image_processed_url || sign.image_original_url;
   const label = sign.restaurant_name || "Unknown Restaurant";
   const dateVisited = sign.date_visited || sign.date_collected;
+  const stars = Number(sign.usability_rating) > 0 ? "🌟".repeat(Math.min(Number(sign.usability_rating), 3)) : "";
 
   return (
     <Link
@@ -22,6 +23,7 @@ export function SignCard({ sign }: { sign: SignRecord }) {
         <p className="mt-1 font-mono text-[10px] uppercase tracking-normal text-black/55">
           {[sign.borough, dateVisited].filter(Boolean).join(" / ") || "Date unknown"}
         </p>
+        {stars && <p className="mt-1 text-xs">{stars}</p>}
       </div>
     </Link>
   );

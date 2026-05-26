@@ -19,11 +19,11 @@ export default async function SignDetailPage({
   const dateVisited = sign.date_visited || sign.date_collected;
   const usabilityLabel =
     sign.usability_rating === "1"
-      ? "1 - Non-Functional"
+      ? "🌟 Non-Functional"
       : sign.usability_rating === "2"
-        ? "2 - Marginal"
+        ? "🌟🌟 Marginal"
         : sign.usability_rating === "3"
-          ? "3 - Usable"
+          ? "🌟🌟🌟 Usable"
           : "Unrated";
   const tags = sign.tags
     .split(",")
@@ -62,6 +62,7 @@ export default async function SignDetailPage({
               ["Designer", sign.designer],
               ["Borough", sign.borough],
               ["Date Visited", dateVisited],
+              ["Submitted By", sign.submitter_name],
               ["Usability", usabilityLabel],
             ].map(([label, value]) => (
               <div key={label} className="grid grid-cols-[140px_1fr] bg-white">

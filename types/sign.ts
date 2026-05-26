@@ -24,6 +24,8 @@ export type SignRecord = {
   status: string;
   submitted_at: string;
   usability_rating: string;
+  submitter_name: string;
+  featured: boolean;
 };
 
 export type SignInput = Omit<SignRecord, "id" | "created_at" | "updated_at"> & {
@@ -56,4 +58,6 @@ export const SHEET_COLUMNS = [
   "submitted_at",
   "designer_url",
   "usability_rating",
+  "submitter_name",
+  "featured",
 ] as const;

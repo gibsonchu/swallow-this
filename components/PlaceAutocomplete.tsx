@@ -36,9 +36,11 @@ export function PlaceAutocomplete({
 
     const input = query.trim();
     if (input.length < 2) {
-      setPredictions([]);
-      setOpen(false);
-      setStatus("Search For A Restaurant");
+      queueMicrotask(() => {
+        setPredictions([]);
+        setOpen(false);
+        setStatus("Search For A Restaurant");
+      });
       return;
     }
 

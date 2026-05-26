@@ -45,6 +45,8 @@ export async function POST(request: Request) {
       status: body.status || (body.published ? "approved" : "draft"),
       submitted_at: body.submitted_at || "",
       usability_rating: body.usability_rating || "",
+      submitter_name: body.submitter_name || "Gibson Chu",
+      featured: Boolean(body.featured),
     });
 
     return NextResponse.json(result);
@@ -89,6 +91,8 @@ export async function PATCH(request: Request) {
       status: body.status || (body.published ? "approved" : "draft"),
       submitted_at: body.submitted_at || "",
       usability_rating: body.usability_rating || "",
+      submitter_name: body.submitter_name || "Gibson Chu",
+      featured: Boolean(body.featured),
     });
 
     return NextResponse.json(result);

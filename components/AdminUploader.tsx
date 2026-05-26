@@ -31,6 +31,8 @@ type SignForm = {
   status: string;
   submitted_at: string;
   usability_rating: string;
+  submitter_name: string;
+  featured: boolean;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -54,6 +56,8 @@ const initialForm: SignForm = {
   status: "draft",
   submitted_at: "",
   usability_rating: "",
+  submitter_name: "Gibson Chu",
+  featured: false,
 };
 
 function formFromSign(sign: SignRecord): SignForm {
@@ -78,6 +82,8 @@ function formFromSign(sign: SignRecord): SignForm {
     status: sign.status || (sign.published ? "approved" : "draft"),
     submitted_at: sign.submitted_at || "",
     usability_rating: sign.usability_rating || "",
+    submitter_name: sign.submitter_name || "Gibson Chu",
+    featured: Boolean(sign.featured),
   };
 }
 
@@ -103,7 +109,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   }, []);
 
   useEffect(() => {
-    void loadSigns();
+    queueMicrotask(() => void loadSigns());
   }, [loadSigns]);
 
   const setField = (field: keyof SignForm, value: string | boolean) => {
@@ -280,6 +286,11 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
         </label>
 
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Submitter Name</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.submitter_name} onChange={(event) => setField("submitter_name", event.target.value)} />
+        </label>
+
         <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
 
         <label className="grid gap-1 text-sm">
@@ -321,9 +332,9 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <span className="font-medium">Usability Rating</span>
           <select className="border border-black/15 bg-white px-3 py-2" value={form.usability_rating} onChange={(event) => setField("usability_rating", event.target.value)}>
             <option value="">Unrated</option>
-            <option value="1">1 - Non-Functional</option>
-            <option value="2">2 - Marginal</option>
-            <option value="3">3 - Usable</option>
+            <option value="1">🌟 Non-Functional</option>
+            <option value="2">🌟🌟 Marginal</option>
+            <option value="3">🌟🌟🌟 Usable</option>
           </select>
         </label>
 
@@ -338,6 +349,10 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={form.published} onChange={(event) => setField("published", event.target.checked)} />
           Published
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={form.featured} onChange={(event) => setField("featured", event.target.checked)} />
+          Featured Sign
         </label>
         {form.status === "pending" && (
           <p className="border border-black/10 bg-white p-3 font-mono text-xs uppercase text-black/55">

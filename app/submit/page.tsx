@@ -9,7 +9,7 @@ export default function SubmitPage() {
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
         <div>
           <p className="font-mono text-[11px] uppercase text-black/45">Spotted one?</p>
-          <h1 className="mt-1 text-3xl font-semibold leading-none">Submit it</h1>
+          <h1 className="display-title mt-1 text-3xl leading-none">Submit It</h1>
         </div>
         <nav className="flex gap-4 text-sm font-medium">
           <Link className="text-black/45 hover:text-black" href="/">Archive</Link>

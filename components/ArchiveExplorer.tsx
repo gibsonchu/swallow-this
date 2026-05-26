@@ -12,24 +12,18 @@ function boroughFor(sign: SignRecord) {
 }
 
 function searchableText(sign: SignRecord) {
-  return [
-    sign.restaurant_name,
-    sign.designer,
-    sign.usability_rating,
-    sign.borough,
-    sign.neighborhood,
-    sign.notes,
-    sign.tags,
-    sign.formatted_address,
-  ]
-    .join(" ")
-    .toLowerCase();
+  return sign.restaurant_name.toLowerCase();
+}
+
+function stars(rating: string) {
+  const count = Number(rating);
+  return Number.isFinite(count) && count > 0 ? "🌟".repeat(Math.min(count, 3)) : "";
 }
 
 export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   const [borough, setBorough] = useState("All");
   const [query, setQuery] = useState("");
-  const featured = signs[0];
+  const featured = signs.find((sign) => sign.featured) || signs[0];
 
   const boroughs = useMemo(() => {
     const available = new Set(signs.map(boroughFor));
@@ -40,7 +34,11 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
     const normalizedQuery = query.trim().toLowerCase();
     return signs.filter((sign) => {
       const matchesBorough = borough === "All" || boroughFor(sign) === borough;
-      const matchesQuery = !normalizedQuery || searchableText(sign).includes(normalizedQuery);
+      const matchesQuery =
+        !normalizedQuery ||
+        normalizedQuery
+          .split(/\s+/)
+          .every((term) => searchableText(sign).includes(term));
       return matchesBorough && matchesQuery;
     });
   }, [borough, query, signs]);
@@ -50,21 +48,21 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
     : filteredSigns;
 
   return (
-    <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[270px_1fr]">
-      <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r md:p-7">
-        <h1 className="max-w-[10rem] text-2xl font-semibold leading-[0.95] tracking-normal md:text-3xl">
+    <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
+      <aside className="border-b border-black/10 p-6 md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r md:p-10">
+        <h1 className="display-title max-w-[13rem] text-[2rem] leading-[0.9] tracking-normal md:text-[2.55rem]">
           Choking Hazard Signs
         </h1>
-        <p className="mt-4 max-w-[13rem] text-sm leading-5 text-black/55">
+        <p className="mt-5 max-w-[14rem] text-sm leading-6 text-black/55">
           An archive of choking hazard signs around New York City.
         </p>
 
-        <nav className="mt-8 grid gap-7">
+        <nav className="mt-11 grid gap-9">
           <label className="grid gap-2">
             <span className="font-mono text-[11px] uppercase text-black/40">Search</span>
             <input
               className="w-full border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black"
-              placeholder="Restaurant, tag, note"
+              placeholder="Restaurant name"
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -92,17 +90,19 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
             <span className="text-lg font-semibold text-black">Archive</span>
             <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">Map</Link>
             <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/about">About</Link>
-            <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/submit">Spotted one? Submit it</Link>
+            <Link className="mt-3 w-fit border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-white hover:text-black" href="/submit">
+              Spotted One? Submit It
+            </Link>
           </div>
 
           <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
         </nav>
       </aside>
 
-      <section className="px-4 py-6 md:px-8 md:py-10">
+      <section className="px-5 py-8 md:px-12 md:py-14">
         {featured && !query.trim() && borough === "All" && (
           <Link
-            className="mb-12 grid gap-6 border-b border-black/10 pb-10 md:grid-cols-[minmax(220px,360px)_minmax(0,1fr)]"
+            className="mb-20 grid gap-10 border-b border-black/10 pb-14 md:grid-cols-[minmax(220px,380px)_minmax(0,1fr)]"
             href={`/sign/${featured.id}`}
           >
             <div className="bg-white">
@@ -114,14 +114,17 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
               />
             </div>
             <div className="flex max-w-xl flex-col justify-end pb-2">
-              <p className="font-mono text-[11px] uppercase text-black/45">Featured sign</p>
-              <h2 className="mt-3 text-4xl font-semibold leading-none md:text-6xl">
+              <p className="font-mono text-[11px] uppercase text-black/45">Featured Sign</p>
+              <h2 className="mt-4 text-4xl font-semibold leading-none md:text-6xl">
                 {featured.restaurant_name || "Unknown Restaurant"}
               </h2>
               <p className="mt-5 text-sm leading-6 text-black/60">
                 {[featured.borough, featured.date_visited || featured.date_collected].filter(Boolean).join(" / ") ||
                   "Location pending"}
               </p>
+              {stars(featured.usability_rating) && (
+                <p className="mt-4 text-lg leading-none">{stars(featured.usability_rating)}</p>
+              )}
               {featured.notes && <p className="mt-5 max-w-md text-base leading-7 text-black/70">{featured.notes}</p>}
             </div>
           </Link>
