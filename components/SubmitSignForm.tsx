@@ -104,7 +104,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
     setFile(null);
     setPreviewUrl("");
     setPlaceResetKey((key) => key + 1);
-    setMessage(result.warning || "Submitted. It Will Show Up After Review.");
+    setMessage(result.warning || "Thank you for submitting a choking hazard sign.");
   };
 
   return (
@@ -212,7 +212,11 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
           {busy ? "Submitting" : "Submit For Review"}
         </button>
 
-        {message && <p className="font-mono text-xs uppercase text-black/55">{message}</p>}
+        {message && (
+          <div className="border border-black bg-white px-4 py-3 text-sm shadow-sm">
+            {message}
+          </div>
+        )}
       </section>
     </div>
   );

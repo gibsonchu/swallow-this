@@ -41,7 +41,7 @@ export function SignModal({
   return (
     <div className="fixed inset-0 z-[1000] bg-[#fdfdf9]/70 backdrop-blur-md" role="dialog" aria-modal="true">
       <button className="absolute inset-0 cursor-default" type="button" aria-label="Close" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 grid max-h-[88vh] w-[min(980px,92vw)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-auto border border-black/10 bg-[#fdfdf9] p-5 shadow-sm md:grid-cols-[minmax(0,1fr)_330px]">
+      <div className="absolute left-1/2 top-1/2 grid max-h-[88vh] min-h-[min(720px,88vh)] w-[min(980px,92vw)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-auto border border-black/10 bg-[#fdfdf9] p-5 shadow-sm md:grid-cols-[minmax(0,1fr)_330px]">
         <button className="absolute right-3 top-3 font-mono text-[11px] uppercase text-black/45 hover:text-black" type="button" onClick={onClose}>
           Close
         </button>
@@ -49,12 +49,12 @@ export function SignModal({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={imageFor(sign)} alt={sign.restaurant_name || "Choking hazard sign"} className="archive-image max-h-[72vh] w-full object-contain object-center p-3" />
         </div>
-        <section className="grid content-start gap-4 pr-6 md:pr-0">
+        <section className="flex min-h-[520px] flex-col gap-4 pr-6 md:pr-0">
           <div>
             <p className="font-mono text-[11px] uppercase text-black/45">
               {index + 1} / {total}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold leading-tight">{sign.restaurant_name || "Unknown Restaurant"}</h2>
+            <h2 className="display-title mt-2 text-2xl leading-[0.95]">{sign.restaurant_name || "Unknown Restaurant"}</h2>
           </div>
           <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
             {metadata.map(([label, value]) => (
@@ -82,7 +82,7 @@ export function SignModal({
               <p className="text-sm leading-6 text-black/75">{sign.notes}</p>
             </section>
           )}
-          <div className="mt-2 flex items-center justify-between gap-3 font-mono text-[11px] uppercase text-black/45">
+          <div className="mt-auto flex items-center justify-between gap-3 border-t border-black/10 pt-4 font-mono text-[11px] uppercase text-black/45">
             <button type="button" className="hover:text-black" onClick={onPrev}>
               ← Prev
             </button>

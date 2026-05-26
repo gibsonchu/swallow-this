@@ -91,6 +91,8 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
             />
           </label>
 
+          <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
+
           <div className="grid gap-1">
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Borough</p>
             {boroughs.map((item) => (
@@ -147,12 +149,10 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
             <span className="text-lg font-semibold text-black">Archive</span>
             <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">Map</Link>
             <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/about">About</Link>
-            <Link className="mt-3 w-fit border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-white hover:text-black" href="/submit">
-              Spotted One? Submit It
+            <Link className="mt-3 w-fit border border-black bg-black px-4 py-2 text-lg font-semibold leading-tight text-white hover:bg-white hover:text-black" href="/submit">
+              Submit A Sign
             </Link>
           </div>
-
-          <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
         </nav>
       </aside>
 
@@ -170,7 +170,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
                   className="archive-image max-h-[62vh] max-w-[min(520px,74vw)] object-contain object-center transition group-hover:scale-[1.01]"
                 />
                 <span className="text-center">
-                  <span className="block text-xl font-semibold">{selectedGallerySign.restaurant_name || "Unknown Restaurant"}</span>
+                  <span className="display-title block text-xl leading-none">{selectedGallerySign.restaurant_name || "Unknown Restaurant"}</span>
                   <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
                     {[selectedGallerySign.borough, selectedGallerySign.date_visited || selectedGallerySign.date_collected].filter(Boolean).join(" / ") || "Unlabeled"}
                   </span>

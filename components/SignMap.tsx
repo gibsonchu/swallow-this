@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SignModal } from "@/components/SignModal";
 import type { SignRecord } from "@/types/sign";
 import type * as Leaflet from "leaflet";
 
@@ -31,6 +32,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
   const leafletRef = useRef<typeof Leaflet | null>(null);
   const markerRefs = useRef<Record<string, Leaflet.Marker>>({});
   const [mapReady, setMapReady] = useState(false);
+  const [modalIndex, setModalIndex] = useState<number | null>(null);
   const mappedSigns = useMemo(
     () =>
       [...signs]
@@ -91,8 +93,8 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
       const imageUrl = sign.image_processed_url || sign.image_original_url;
       const restaurant = escapeHtml(sign.restaurant_name || "Unknown Restaurant");
       const address = escapeHtml(sign.formatted_address || "Address Pending");
-      const restaurantHref = sign.restaurant_website_url || `/sign/${encodeURIComponent(sign.id)}`;
       const addressHref = sign.google_maps_url || `/sign/${encodeURIComponent(sign.id)}`;
+      const index = mappedSigns.findIndex((item) => item.sign.id === sign.id);
       const icon = leaflet.divIcon({
         className: "",
         html: `
@@ -110,13 +112,16 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
         .bindPopup(
           `
           <div class="w-56 text-sm leading-tight">
-            <a class="block font-semibold underline-offset-2 hover:underline" href="${escapeHtml(restaurantHref)}" target="${sign.restaurant_website_url ? "_blank" : "_self"}">${restaurant}</a>
+            <span class="block font-semibold">${restaurant}</span>
             <a class="mt-2 block text-xs leading-4 text-black/65 underline-offset-2 hover:underline" href="${escapeHtml(addressHref)}" target="_blank">${address}</a>
-            <a class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" href="/sign/${escapeHtml(sign.id)}">View Sign</a>
+            <button class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" type="button" data-sign-modal-index="${index}">View Sign</button>
           </div>
         `,
           { className: "sign-map-popup" },
         );
+      marker.on("click", () => {
+        map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
+      });
       markerRefs.current[sign.id] = marker;
       bounds.push([lat, lng]);
     });
@@ -126,6 +131,21 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     }
   }, [mapReady, mappedSigns]);
 
+  useEffect(() => {
+    const element = mapElementRef.current;
+    if (!element) return;
+
+    const openModalFromPopup = (event: MouseEvent) => {
+      const target = event.target instanceof HTMLElement ? event.target.closest("[data-sign-modal-index]") : null;
+      if (!(target instanceof HTMLElement)) return;
+      const index = Number(target.dataset.signModalIndex);
+      if (Number.isFinite(index)) setModalIndex(index);
+    };
+
+    element.addEventListener("click", openModalFromPopup);
+    return () => element.removeEventListener("click", openModalFromPopup);
+  }, []);
+
   const focusSign = (sign: SignRecord) => {
     const map = mapRef.current;
     const marker = markerRefs.current[sign.id];
@@ -133,6 +153,10 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
     marker.openPopup();
   };
+
+  const prevIndex = (index: number) => (index - 1 + mappedSigns.length) % mappedSigns.length;
+  const nextIndex = (index: number) => (index + 1) % mappedSigns.length;
+  const activeModalSign = modalIndex === null ? null : mappedSigns[modalIndex]?.sign;
 
   return (
     <section className="h-full bg-[#fdfdf9]">
@@ -166,6 +190,16 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           </div>
         </div>
       </div>
+      {activeModalSign && (
+        <SignModal
+          sign={activeModalSign}
+          index={modalIndex ?? 0}
+          total={mappedSigns.length}
+          onClose={() => setModalIndex(null)}
+          onPrev={() => setModalIndex((index) => (index === null ? null : prevIndex(index)))}
+          onNext={() => setModalIndex((index) => (index === null ? null : nextIndex(index)))}
+        />
+      )}
     </section>
   );
 }
