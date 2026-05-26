@@ -17,7 +17,7 @@ export default async function AdminPage() {
         >
           <div>
             <h1 className="display-title text-2xl leading-none">Choking Hazard Signs Admin</h1>
-            <p className="mt-1 text-sm text-black/55">Enter the archive password.</p>
+            <p className="mt-1 text-sm text-black/55">Enter the index password.</p>
           </div>
           <label className="grid gap-1 text-sm">
             <span className="font-medium">Password</span>

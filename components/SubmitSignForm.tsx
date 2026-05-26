@@ -112,7 +112,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
       <section className="grid content-start gap-4">
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Image</span>
-          <input className="border border-black/15 bg-white p-2" type="file" accept="image/*" onChange={(event) => chooseFile(event.target.files?.[0])} />
+          <input className="cursor-pointer border border-black/15 bg-white p-2 text-sm file:mr-3 file:cursor-pointer file:border file:border-black file:bg-black file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-white hover:file:text-black" type="file" accept="image/*" onChange={(event) => chooseFile(event.target.files?.[0])} />
         </label>
         <div className="aspect-[4/5] border border-black/10 bg-white">
           {previewUrl ? (

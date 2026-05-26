@@ -17,8 +17,7 @@ export default async function SignDetailPage({
   const imageUrl = sign.image_processed_url || sign.image_original_url;
   const label = sign.restaurant_name || "Unknown Restaurant";
   const dateVisited = sign.date_visited || sign.date_collected;
-  const designerLabel = sign.designer || "Unknown. Please contact me to provide credit.";
-  const designerHref = sign.designer_url || "https://x.com/gibsontchu";
+  const hasDesigner = Boolean(sign.designer);
   const tags = sign.tags
     .split(",")
     .map((tag) => tag.trim())
@@ -28,7 +27,7 @@ export default async function SignDetailPage({
     <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
       <header className="border-b border-black/10 px-4 py-3">
         <Link className="font-mono text-xs uppercase text-black/55 hover:text-black" href="/">
-          Back To Archive
+          Back To Index
         </Link>
       </header>
       <article className="grid gap-6 px-4 py-6 md:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] md:px-6">
@@ -53,7 +52,7 @@ export default async function SignDetailPage({
           <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
             {[
               ["Address", sign.formatted_address],
-              ["Designer", designerLabel],
+              ["Designer", sign.designer || "Unknown"],
               ["Borough", sign.borough],
               ["Date Visited", dateVisited],
               ["Submitted By", sign.submitter_name],
@@ -70,14 +69,17 @@ export default async function SignDetailPage({
                     <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
                       {value}
                     </a>
-                  ) : label === "Designer" && sign.designer_url && value ? (
-                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={designerHref} target="_blank" rel="noreferrer">
+                  ) : label === "Designer" && hasDesigner && sign.designer_url && value ? (
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.designer_url} target="_blank" rel="noreferrer">
                       {value}
                     </a>
-                  ) : label === "Designer" ? (
-                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={designerHref} target="_blank" rel="noreferrer">
-                      {value}
-                    </a>
+                  ) : label === "Designer" && !hasDesigner ? (
+                    <>
+                      Unknown.{" "}
+                      <a className="italic underline decoration-black/30 underline-offset-2 hover:decoration-black" href="https://x.com/gibsontchu" target="_blank" rel="noreferrer">
+                        Please contact me to provide credit.
+                      </a>
+                    </>
                   ) : (
                     value || "Unknown"
                   )}

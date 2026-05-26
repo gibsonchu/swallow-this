@@ -17,7 +17,7 @@ export default async function MapPage() {
           </p>
         </div>
         <nav className="flex gap-4 text-sm font-semibold">
-          <Link className="text-black/45 hover:text-black" href="/">Archive</Link>
+          <Link className="text-black/45 hover:text-black" href="/">Index</Link>
           <Link className="text-black/45 hover:text-black" href="/about">About</Link>
           <Link className="text-black/45 hover:text-black" href="/submit">Submit</Link>
         </nav>

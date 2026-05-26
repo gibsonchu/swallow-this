@@ -22,7 +22,7 @@ const archivoBlack = Archivo_Black({
 
 export const metadata: Metadata = {
   title: "Choking Hazard Signs",
-  description: "An archive of choking hazard signs around New York City.",
+  description: "An index of choking hazard signs around New York City.",
 };
 
 export default function RootLayout({

@@ -25,11 +25,10 @@ export function SignModal({
   onPrev: () => void;
   onNext: () => void;
 }) {
-  const designerLabel = sign.designer || "Unknown. Please contact me to provide credit.";
-  const designerHref = sign.designer_url || "https://x.com/gibsontchu";
+  const hasDesigner = Boolean(sign.designer);
   const metadata: [string, string][] = [
     ["Address", sign.formatted_address],
-    ["Designer", designerLabel],
+    ["Designer", sign.designer || "Unknown"],
     ["Borough", sign.borough],
     ["Date Visited", dateFor(sign)],
     ["Submitted By", sign.submitter_name],
@@ -65,10 +64,17 @@ export function SignModal({
                     <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
                       {value}
                     </a>
-                  ) : label === "Designer" ? (
-                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={designerHref} target="_blank" rel="noreferrer">
+                  ) : label === "Designer" && hasDesigner && sign.designer_url ? (
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.designer_url} target="_blank" rel="noreferrer">
                       {value}
                     </a>
+                  ) : label === "Designer" && !hasDesigner ? (
+                    <>
+                      Unknown.{" "}
+                      <a className="italic underline decoration-black/30 underline-offset-2 hover:decoration-black" href="https://x.com/gibsontchu" target="_blank" rel="noreferrer">
+                        Please contact me to provide credit.
+                      </a>
+                    </>
                   ) : (
                     value || "Unknown"
                   )}

@@ -92,8 +92,9 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     mappedSigns.forEach(({ sign, lat, lng }) => {
       const imageUrl = sign.image_processed_url || sign.image_original_url;
       const restaurant = escapeHtml(sign.restaurant_name || "Unknown Restaurant");
-      const address = escapeHtml(sign.formatted_address || "Address Pending");
-      const addressHref = sign.google_maps_url || `/sign/${encodeURIComponent(sign.id)}`;
+      const addressHtml = sign.formatted_address
+        ? `<a class="mt-2 block text-xs leading-4 text-black/65 underline-offset-2 hover:underline" href="${escapeHtml(sign.google_maps_url || `/sign/${encodeURIComponent(sign.id)}`)}" target="_blank">${escapeHtml(sign.formatted_address)}</a>`
+        : "";
       const index = mappedSigns.findIndex((item) => item.sign.id === sign.id);
       const icon = leaflet.divIcon({
         className: "",
@@ -113,7 +114,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           `
           <div class="w-56 text-sm leading-tight">
             <span class="block font-semibold">${restaurant}</span>
-            <a class="mt-2 block text-xs leading-4 text-black/65 underline-offset-2 hover:underline" href="${escapeHtml(addressHref)}" target="_blank">${address}</a>
+            ${addressHtml}
             <button class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" type="button" data-sign-modal-index="${index}">View Sign</button>
           </div>
         `,

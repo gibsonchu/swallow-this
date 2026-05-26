@@ -71,12 +71,12 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
   return (
     <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
-      <aside className="border-b border-black/10 p-6 md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r md:p-10">
+      <aside className="border-b border-black/10 p-6 md:sticky md:top-0 md:h-screen md:border-b-0 md:p-10">
         <h1 className="display-title max-w-[13rem] text-[2rem] leading-[0.9] tracking-normal md:text-[2.55rem]">
           Choking Hazard Signs
         </h1>
         <p className="mt-5 max-w-[14rem] text-sm leading-6 text-black/55">
-          An archive of choking hazard signs around New York City.
+          An index of choking hazard signs around New York City.
         </p>
 
         <nav className="mt-11 grid gap-9">
@@ -146,7 +146,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
           <div className="grid gap-1">
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Pages</p>
-            <span className="text-lg font-semibold text-black">Archive</span>
+            <span className="text-lg font-semibold text-black">Index</span>
             <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">Map</Link>
             <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/about">About</Link>
             <Link className="mt-3 w-fit border border-black bg-black px-4 py-2 text-lg font-semibold leading-tight text-white hover:bg-white hover:text-black" href="/submit">

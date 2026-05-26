@@ -270,7 +270,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Image</span>
           <input
-            className="border border-black/15 bg-white p-2"
+            className="cursor-pointer border border-black/15 bg-white p-2 text-sm file:mr-3 file:cursor-pointer file:border file:border-black file:bg-black file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-white hover:file:text-black"
             type="file"
             accept="image/*"
             onChange={(event) => handleSingleFile(event.target.files?.[0])}
@@ -415,7 +415,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               type="button"
               onClick={() => setTab("archive")}
             >
-              Archive ({archiveSigns.length})
+              Index ({archiveSigns.length})
             </button>
             <button
               className={`p-3 text-left font-mono text-[11px] uppercase ${tab === "submissions" ? "text-black" : "text-black/40"}`}
@@ -446,7 +446,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           ))}
           {visibleSigns.length === 0 && (
             <p className="p-4 text-sm text-black/45">
-              {tab === "submissions" ? "No Pending Submissions." : "No Archive Records."}
+              {tab === "submissions" ? "No Pending Submissions." : "No Index Records."}
             </p>
           )}
         </div>

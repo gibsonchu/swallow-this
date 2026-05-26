@@ -12,7 +12,7 @@ export default function SubmitPage() {
           <h1 className="display-title mt-1 text-3xl leading-none">Submit A Sign</h1>
         </div>
         <nav className="flex gap-4 text-sm font-medium">
-          <Link className="text-black/45 hover:text-black" href="/">Archive</Link>
+          <Link className="text-black/45 hover:text-black" href="/">Index</Link>
           <Link className="text-black/45 hover:text-black" href="/map">Map</Link>
           <Link className="text-black/45 hover:text-black" href="/about">About</Link>
         </nav>
