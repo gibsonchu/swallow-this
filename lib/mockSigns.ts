@@ -39,6 +39,7 @@ export const mockSigns: SignRecord[] = [
     restaurants_using_design: "",
     submitter_name: "Gibson Chu",
     featured: true,
+    sort_order: "1",
   },
   {
     id: "mock-2",
@@ -68,6 +69,7 @@ export const mockSigns: SignRecord[] = [
     restaurants_using_design: "",
     submitter_name: "Gibson Chu",
     featured: false,
+    sort_order: "2",
   },
   {
     id: "mock-3",
@@ -97,6 +99,7 @@ export const mockSigns: SignRecord[] = [
     restaurants_using_design: "",
     submitter_name: "Gibson Chu",
     featured: false,
+    sort_order: "3",
   },
   {
     id: "mock-4",
@@ -126,5 +129,6 @@ export const mockSigns: SignRecord[] = [
     restaurants_using_design: "",
     submitter_name: "Gibson Chu",
     featured: false,
+    sort_order: "4",
   },
 ];

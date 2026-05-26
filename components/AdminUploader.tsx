@@ -33,6 +33,7 @@ type SignForm = {
   restaurants_using_design: string;
   submitter_name: string;
   featured: boolean;
+  sort_order: string;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -58,6 +59,7 @@ const initialForm: SignForm = {
   restaurants_using_design: "",
   submitter_name: "Gibson Chu",
   featured: false,
+  sort_order: "",
 };
 
 function formFromSign(sign: SignRecord): SignForm {
@@ -84,7 +86,15 @@ function formFromSign(sign: SignRecord): SignForm {
     restaurants_using_design: sign.restaurants_using_design || "",
     submitter_name: sign.submitter_name || "Gibson Chu",
     featured: Boolean(sign.featured),
+    sort_order: sign.sort_order || "",
   };
+}
+
+function featuredSort(a: SignRecord, b: SignRecord) {
+  const aOrder = Number(a.sort_order || Number.MAX_SAFE_INTEGER);
+  const bOrder = Number(b.sort_order || Number.MAX_SAFE_INTEGER);
+  if (aOrder !== bOrder) return aOrder - bOrder;
+  return (a.restaurant_name || "").localeCompare(b.restaurant_name || "");
 }
 
 export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string }) {
@@ -100,7 +110,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   const editing = Boolean(form.id);
   const disabled = useMemo(() => Boolean(busy), [busy]);
   const pendingSigns = useMemo(() => signs.filter((sign) => sign.status === "pending"), [signs]);
-  const archiveSigns = useMemo(() => signs.filter((sign) => sign.status !== "pending"), [signs]);
+  const archiveSigns = useMemo(() => signs.filter((sign) => sign.status !== "pending").sort(featuredSort), [signs]);
   const visibleSigns = tab === "submissions" ? pendingSigns : archiveSigns;
 
   const loadSigns = useCallback(async () => {
@@ -299,6 +309,11 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <input className="border border-black/15 bg-white px-3 py-2" value={form.submitter_name} onChange={(event) => setField("submitter_name", event.target.value)} />
         </label>
 
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Sort Order</span>
+          <input className="border border-black/15 bg-white px-3 py-2" inputMode="numeric" value={form.sort_order} onChange={(event) => setField("sort_order", event.target.value)} />
+        </label>
+
         <PlaceAutocomplete apiKey={googleMapsApiKey} resetKey={placeResetKey} onPlaceSelected={handlePlaceSelected} />
 
         <label className="grid gap-1 text-sm">
@@ -424,7 +439,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               <span className="min-w-0">
                 <span className="block truncate text-sm font-medium">{sign.restaurant_name || "Untitled Sign"}</span>
                 <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
-                  {[sign.borough || "Unknown", sign.status === "pending" ? "Pending" : sign.published ? "Published" : "Draft"].join(" / ")}
+                  {[sign.sort_order ? `#${sign.sort_order}` : "No Order", sign.borough || "Unknown", sign.status === "pending" ? "Pending" : sign.published ? "Published" : "Draft"].join(" / ")}
                 </span>
               </span>
             </button>

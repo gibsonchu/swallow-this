@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       restaurants_using_design: text(form, "restaurants_using_design"),
       submitter_name: text(form, "submitter_name") || "Gibson Chu",
       featured: false,
+      sort_order: "",
     });
 
     return NextResponse.json({

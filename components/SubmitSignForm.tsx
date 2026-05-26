@@ -20,6 +20,7 @@ type SubmissionForm = {
   date_visited: string;
   restaurants_using_design: string;
   submitter_name: string;
+  sort_order: string;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -41,6 +42,7 @@ const initialForm: SubmissionForm = {
   date_visited: today,
   restaurants_using_design: "",
   submitter_name: "",
+  sort_order: "",
 };
 
 export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string }) {

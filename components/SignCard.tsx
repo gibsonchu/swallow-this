@@ -1,14 +1,14 @@
-import Link from "next/link";
 import type { SignRecord } from "@/types/sign";
 
-export function SignCard({ sign }: { sign: SignRecord }) {
+export function SignCard({ sign, onSelect }: { sign: SignRecord; onSelect: () => void }) {
   const imageUrl = sign.image_processed_url || sign.image_original_url;
   const label = sign.restaurant_name || "Unknown Restaurant";
   const dateVisited = sign.date_visited || sign.date_collected;
 
   return (
-    <Link
-      href={`/sign/${sign.id}`}
+    <button
+      type="button"
+      onClick={onSelect}
       className="archive-card group block text-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-black"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -23,6 +23,6 @@ export function SignCard({ sign }: { sign: SignRecord }) {
           {[sign.borough, dateVisited].filter(Boolean).join(" / ") || "Date unknown"}
         </p>
       </div>
-    </Link>
+    </button>
   );
 }

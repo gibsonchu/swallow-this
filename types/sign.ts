@@ -26,6 +26,7 @@ export type SignRecord = {
   restaurants_using_design: string;
   submitter_name: string;
   featured: boolean;
+  sort_order: string;
 };
 
 export type SignInput = Omit<SignRecord, "id" | "created_at" | "updated_at"> & {
@@ -60,4 +61,5 @@ export const SHEET_COLUMNS = [
   "restaurants_using_design",
   "submitter_name",
   "featured",
+  "sort_order",
 ] as const;

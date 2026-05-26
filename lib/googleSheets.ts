@@ -116,6 +116,7 @@ function rowToSign(row: string[]): SignRecord {
     restaurants_using_design: record.restaurants_using_design || "",
     submitter_name: record.submitter_name || DEFAULT_SUBMITTER_NAME,
     featured: parseBoolean(record.featured),
+    sort_order: record.sort_order || "",
   };
 }
 
@@ -129,7 +130,7 @@ function signToRow(sign: SignRecord) {
 
 async function getSheetRows() {
   const response = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:AA")}`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:AB")}`,
   );
   if (!response) return [];
 
@@ -209,6 +210,7 @@ export async function createSign(input: SignInput) {
     restaurants_using_design: input.restaurants_using_design || "",
     submitter_name: input.submitter_name || DEFAULT_SUBMITTER_NAME,
     featured: Boolean(input.featured),
+    sort_order: input.sort_order || "",
   };
 
   if (!hasSheetsEnv()) {
@@ -217,10 +219,11 @@ export async function createSign(input: SignInput) {
 
   const rows = await getSheetRows();
   const nextRowNumber = rows.length + 1;
+  if (!sign.sort_order) sign.sort_order = String(Math.max(nextRowNumber - 1, 1));
 
   const writeResponse = await sheetsFetch(
     `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(
-      `Signs!A${nextRowNumber}:AA${nextRowNumber}`,
+      `Signs!A${nextRowNumber}:AB${nextRowNumber}`,
     )}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
@@ -257,10 +260,11 @@ export async function updateSign(id: string, input: Partial<SignInput>) {
     restaurants_using_design: input.restaurants_using_design || existing.restaurants_using_design || "",
     submitter_name: input.submitter_name || existing.submitter_name || DEFAULT_SUBMITTER_NAME,
     featured: Boolean(input.featured),
+    sort_order: input.sort_order ?? existing.sort_order ?? "",
   };
 
   const writeResponse = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:AA${rowNumber}`)}?valueInputOption=USER_ENTERED`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:AB${rowNumber}`)}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
       body: JSON.stringify({ values: [signToRow(sign)] }),
@@ -279,7 +283,7 @@ export async function deleteSign(id: string) {
 
   const sign = rowToSign(rows[rowNumber - 1]);
   await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:AA${rowNumber}`)}:clear`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:AB${rowNumber}`)}:clear`,
     { method: "POST", body: JSON.stringify({}) },
   );
 

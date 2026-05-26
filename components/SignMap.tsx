@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import type { SignRecord } from "@/types/sign";
 import type * as Leaflet from "leaflet";
 
@@ -21,12 +20,25 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#039;");
 }
 
+function sortValue(sign: SignRecord) {
+  const value = Number(sign.sort_order);
+  return Number.isFinite(value) ? value : Number.MAX_SAFE_INTEGER;
+}
+
 export function SignMap({ signs }: { signs: SignRecord[] }) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Leaflet.Map | null>(null);
   const leafletRef = useRef<typeof Leaflet | null>(null);
+  const markerRefs = useRef<Record<string, Leaflet.Marker>>({});
   const [mapReady, setMapReady] = useState(false);
-  const mappedSigns = useMemo(() => signs.map(mappedSign).filter(Boolean) as { sign: SignRecord; lat: number; lng: number }[], [signs]);
+  const mappedSigns = useMemo(
+    () =>
+      [...signs]
+        .sort((a, b) => sortValue(a) - sortValue(b) || (a.restaurant_name || "").localeCompare(b.restaurant_name || ""))
+        .map(mappedSign)
+        .filter(Boolean) as { sign: SignRecord; lat: number; lng: number }[],
+    [signs],
+  );
 
   useEffect(() => {
     if (!mapElementRef.current || mapRef.current) return;
@@ -71,6 +83,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     map.eachLayer((layer) => {
       if (layer instanceof leaflet.Marker) map.removeLayer(layer);
     });
+    markerRefs.current = {};
 
     const bounds: [number, number][] = [];
 
@@ -92,7 +105,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
         popupAnchor: [0, -38],
       });
 
-      leaflet.marker([lat, lng], { icon })
+      const marker = leaflet.marker([lat, lng], { icon })
         .addTo(map)
         .bindPopup(
           `
@@ -104,6 +117,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
         `,
           { className: "sign-map-popup" },
         );
+      markerRefs.current[sign.id] = marker;
       bounds.push([lat, lng]);
     });
 
@@ -111,6 +125,14 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
       map.fitBounds(bounds, { padding: [70, 70], maxZoom: 15 });
     }
   }, [mapReady, mappedSigns]);
+
+  const focusSign = (sign: SignRecord) => {
+    const map = mapRef.current;
+    const marker = markerRefs.current[sign.id];
+    if (!map || !marker) return;
+    map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
+    marker.openPopup();
+  };
 
   return (
     <section className="h-full bg-[#fdfdf9]">
@@ -130,7 +152,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           </div>
           <div className="divide-y divide-black/10">
             {mappedSigns.map(({ sign }, index) => (
-              <Link key={sign.id} href={`/sign/${sign.id}`} className="grid grid-cols-[34px_1fr] gap-4 p-4 text-sm hover:bg-white">
+              <button key={sign.id} type="button" onClick={() => focusSign(sign)} className="grid w-full grid-cols-[34px_1fr] gap-4 p-4 text-left text-sm hover:bg-white">
                 <span className="font-mono text-[11px] text-black/45">{String(index + 1).padStart(2, "0")}</span>
                 <span>
                   <span className="block font-medium">{sign.restaurant_name || "Unknown Restaurant"}</span>
@@ -139,7 +161,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
                       "Unlabeled"}
                   </span>
                 </span>
-              </Link>
+              </button>
             ))}
           </div>
         </div>

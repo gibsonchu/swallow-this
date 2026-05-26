@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       restaurants_using_design: body.restaurants_using_design || "",
       submitter_name: body.submitter_name || "Gibson Chu",
       featured: Boolean(body.featured),
+      sort_order: body.sort_order || "",
     });
 
     return NextResponse.json(result);
@@ -93,6 +94,7 @@ export async function PATCH(request: Request) {
       restaurants_using_design: body.restaurants_using_design || "",
       submitter_name: body.submitter_name || "Gibson Chu",
       featured: Boolean(body.featured),
+      sort_order: body.sort_order || "",
     });
 
     return NextResponse.json(result);
