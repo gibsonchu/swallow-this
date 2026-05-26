@@ -192,6 +192,22 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
+            <span className="font-medium">Latitude</span>
+            <input className="border border-black/15 bg-white px-3 py-2" inputMode="decimal" value={form.latitude} onChange={(event) => setField("latitude", event.target.value)} />
+          </label>
+          <label className="grid gap-1 text-sm">
+            <span className="font-medium">Longitude</span>
+            <input className="border border-black/15 bg-white px-3 py-2" inputMode="decimal" value={form.longitude} onChange={(event) => setField("longitude", event.target.value)} />
+          </label>
+        </div>
+
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Google Maps URL</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.google_maps_url} onChange={(event) => setField("google_maps_url", event.target.value)} />
+        </label>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1 text-sm">
             <span className="font-medium">Designer</span>
             <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
           </label>
