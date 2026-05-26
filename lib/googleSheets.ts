@@ -107,6 +107,8 @@ function rowToSign(row: string[]): SignRecord {
   return {
     ...record,
     published: parseBoolean(record.published),
+    status: record.status || (parseBoolean(record.published) ? "approved" : "draft"),
+    submitted_at: record.submitted_at || "",
   };
 }
 
@@ -118,7 +120,7 @@ function signToRow(sign: SignRecord) {
 
 async function getSheetRows() {
   const response = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:V")}`,
   );
   if (!response) return [];
 
@@ -168,6 +170,8 @@ export async function createSign(input: SignInput) {
     created_at: now,
     updated_at: now,
     published: Boolean(input.published),
+    status: input.status || (input.published ? "approved" : "draft"),
+    submitted_at: input.submitted_at || "",
   };
 
   if (!hasSheetsEnv()) {
@@ -179,7 +183,7 @@ export async function createSign(input: SignInput) {
 
   const writeResponse = await sheetsFetch(
     `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(
-      `Signs!A${nextRowNumber}:T${nextRowNumber}`,
+      `Signs!A${nextRowNumber}:V${nextRowNumber}`,
     )}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
@@ -208,10 +212,12 @@ export async function updateSign(id: string, input: Partial<SignInput>) {
     created_at: existing.created_at,
     updated_at: now,
     published: Boolean(input.published),
+    status: input.status || existing.status || (input.published ? "approved" : "draft"),
+    submitted_at: input.submitted_at || existing.submitted_at || "",
   };
 
   const writeResponse = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:T${rowNumber}`)}?valueInputOption=USER_ENTERED`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:V${rowNumber}`)}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
       body: JSON.stringify({ values: [signToRow(sign)] }),
@@ -229,7 +235,7 @@ export async function deleteSign(id: string) {
 
   const sign = rowToSign(rows[rowNumber - 1]);
   await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:T${rowNumber}`)}:clear`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:V${rowNumber}`)}:clear`,
     { method: "POST", body: JSON.stringify({}) },
   );
 

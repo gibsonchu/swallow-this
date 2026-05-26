@@ -32,6 +32,8 @@ export const mockSigns: SignRecord[] = [
     created_at: "2026-05-01T12:00:00.000Z",
     updated_at: "2026-05-01T12:00:00.000Z",
     published: true,
+    status: "approved",
+    submitted_at: "",
   },
   {
     id: "mock-2",
@@ -54,6 +56,8 @@ export const mockSigns: SignRecord[] = [
     created_at: "2026-04-22T12:00:00.000Z",
     updated_at: "2026-04-22T12:00:00.000Z",
     published: true,
+    status: "approved",
+    submitted_at: "",
   },
   {
     id: "mock-3",
@@ -76,6 +80,8 @@ export const mockSigns: SignRecord[] = [
     created_at: "2026-03-12T12:00:00.000Z",
     updated_at: "2026-03-12T12:00:00.000Z",
     published: true,
+    status: "approved",
+    submitted_at: "",
   },
   {
     id: "mock-4",
@@ -98,5 +104,7 @@ export const mockSigns: SignRecord[] = [
     created_at: "2026-02-08T12:00:00.000Z",
     updated_at: "2026-02-08T12:00:00.000Z",
     published: true,
+    status: "approved",
+    submitted_at: "",
   },
 ];

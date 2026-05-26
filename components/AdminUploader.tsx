@@ -26,6 +26,8 @@ type SignForm = {
   date_collected: string;
   date_visited: string;
   published: boolean;
+  status: string;
+  submitted_at: string;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -44,6 +46,8 @@ const initialForm: SignForm = {
   date_collected: today,
   date_visited: today,
   published: false,
+  status: "draft",
+  submitted_at: "",
 };
 
 function formFromSign(sign: SignRecord): SignForm {
@@ -63,11 +67,14 @@ function formFromSign(sign: SignRecord): SignForm {
     date_collected: sign.date_collected || sign.date_visited || today,
     date_visited: sign.date_visited || sign.date_collected || today,
     published: Boolean(sign.published),
+    status: sign.status || (sign.published ? "approved" : "draft"),
+    submitted_at: sign.submitted_at || "",
   };
 }
 
 export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string }) {
   const [form, setForm] = useState<SignForm>(initialForm);
+  const [tab, setTab] = useState<"archive" | "submissions">("archive");
   const [upload, setUpload] = useState<UploadState | null>(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
@@ -76,6 +83,9 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   const imageToShow = upload?.processedUrl || upload?.originalUrl;
   const editing = Boolean(form.id);
   const disabled = useMemo(() => Boolean(busy), [busy]);
+  const pendingSigns = useMemo(() => signs.filter((sign) => sign.status === "pending"), [signs]);
+  const archiveSigns = useMemo(() => signs.filter((sign) => sign.status !== "pending"), [signs]);
+  const visibleSigns = tab === "submissions" ? pendingSigns : archiveSigns;
 
   const loadSigns = useCallback(async () => {
     const response = await fetch("/api/signs?all=1");
@@ -150,6 +160,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         date_collected: form.date_visited,
         image_original_url: originalUrl,
         image_processed_url: processedUrl || originalUrl,
+        status: form.published ? "approved" : form.status || "draft",
       }),
     });
     const result = await response.json();
@@ -185,6 +196,37 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
 
     resetForm();
     setMessage("Removed from Google Sheets.");
+    await loadSigns();
+  };
+
+  const approveCurrentSign = async () => {
+    if (!form.id) return;
+    const originalUrl = upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_original_url;
+    const processedUrl = upload?.processedUrl || upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_processed_url;
+
+    setBusy("Approving");
+    const response = await fetch("/api/signs", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        date_collected: form.date_visited,
+        image_original_url: originalUrl,
+        image_processed_url: processedUrl || originalUrl,
+        published: true,
+        status: "approved",
+      }),
+    });
+    const result = await response.json();
+    setBusy("");
+
+    if (!response.ok) {
+      setMessage(result.error || "Approval failed");
+      return;
+    }
+
+    setMessage("Approved and published.");
+    resetForm();
     await loadSigns();
   };
 
@@ -280,6 +322,11 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <input type="checkbox" checked={form.published} onChange={(event) => setField("published", event.target.checked)} />
           Published
         </label>
+        {form.status === "pending" && (
+          <p className="border border-black/10 bg-white p-3 font-mono text-xs uppercase text-black/55">
+            Pending public submission.
+          </p>
+        )}
 
         <div className="flex gap-2">
           <button
@@ -290,6 +337,11 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           >
             {editing ? "Update sign" : "Save sign"}
           </button>
+          {editing && form.status === "pending" && (
+            <button className="border border-black bg-white px-4 py-2 text-sm hover:bg-black hover:text-white" type="button" disabled={disabled} onClick={approveCurrentSign}>
+              Approve
+            </button>
+          )}
           {editing && (
             <button className="border border-black/15 px-4 py-2 text-sm hover:border-black" type="button" disabled={disabled} onClick={deleteCurrentSign}>
               Delete
@@ -306,11 +358,26 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       </section>
 
       <section className="max-h-[78vh] overflow-auto border border-black/10 bg-white">
-        <div className="sticky top-0 border-b border-black/10 bg-white p-3 font-mono text-[11px] uppercase text-black/45">
-          {signs.length} signs
+        <div className="sticky top-0 border-b border-black/10 bg-white">
+          <div className="grid grid-cols-2">
+            <button
+              className={`border-r border-black/10 p-3 text-left font-mono text-[11px] uppercase ${tab === "archive" ? "text-black" : "text-black/40"}`}
+              type="button"
+              onClick={() => setTab("archive")}
+            >
+              Archive ({archiveSigns.length})
+            </button>
+            <button
+              className={`p-3 text-left font-mono text-[11px] uppercase ${tab === "submissions" ? "text-black" : "text-black/40"}`}
+              type="button"
+              onClick={() => setTab("submissions")}
+            >
+              Submissions ({pendingSigns.length})
+            </button>
+          </div>
         </div>
         <div className="divide-y divide-black/10">
-          {signs.map((sign) => (
+          {visibleSigns.map((sign) => (
             <button
               key={sign.id}
               className="grid w-full grid-cols-[56px_1fr] gap-3 p-3 text-left hover:bg-black/[0.03]"
@@ -322,11 +389,16 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               <span className="min-w-0">
                 <span className="block truncate text-sm font-medium">{sign.restaurant_name || "Untitled sign"}</span>
                 <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
-                  {[sign.borough || "Unknown", sign.published ? "Published" : "Draft"].join(" / ")}
+                  {[sign.borough || "Unknown", sign.status === "pending" ? "Pending" : sign.published ? "Published" : "Draft"].join(" / ")}
                 </span>
               </span>
             </button>
           ))}
+          {visibleSigns.length === 0 && (
+            <p className="p-4 text-sm text-black/45">
+              {tab === "submissions" ? "No pending submissions." : "No archive records."}
+            </p>
+          )}
         </div>
       </section>
     </div>

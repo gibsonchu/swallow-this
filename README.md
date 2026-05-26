@@ -44,10 +44,10 @@ Create a Google Sheet with a tab named `Signs`.
 Add this exact header row in row 1:
 
 ```text
-id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited
+id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at
 ```
 
-The app reads rows on the `Signs` tab and writes new signs to explicit rows. Address, neighborhood, and the legacy sign title column are kept as hidden compatibility fields; the admin uses restaurant, place search, borough, designer, notes, tags, date visited, and published.
+The app reads rows on the `Signs` tab and writes new signs to explicit rows. Address and the legacy sign title column are kept as compatibility fields; the admin and public submission flow use restaurant, place search, borough, neighborhood, designer, notes, tags, date visited, published, `status`, and `submitted_at`. Public submissions are saved as `status=pending` and `published=FALSE`.
 
 ## Google service account
 
@@ -73,8 +73,12 @@ The app reads rows on the `Signs` tab and writes new signs to explicit rows. Add
 
 - `/`: Public archive, published signs only.
 - `/sign/[id]`: Public sign detail page.
+- `/map`: Public map view for published signs with latitude/longitude.
+- `/about`: Article-style project description.
+- `/submit`: Public submission form. Submissions go to the admin review tab.
 - `/admin`: Password-gated admin upload and metadata dashboard.
-- `/api/signs`: `GET` published signs, `GET ?all=1` all signs, authenticated `POST` create sign.
+- `/api/signs`: `GET` published signs, authenticated `GET ?all=1` all signs, authenticated `POST` create sign, authenticated `PATCH` update sign, authenticated `DELETE` clear sign row.
+- `/api/submit`: Public sign submission endpoint.
 - `/api/upload`: Authenticated image upload.
 - `/api/admin/login`: Admin login.
 - `/api/admin/logout`: Admin logout.

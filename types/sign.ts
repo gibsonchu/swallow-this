@@ -19,6 +19,8 @@ export type SignRecord = {
   created_at: string;
   updated_at: string;
   published: boolean;
+  status: string;
+  submitted_at: string;
 };
 
 export type SignInput = Omit<SignRecord, "id" | "created_at" | "updated_at"> & {
@@ -46,4 +48,6 @@ export const SHEET_COLUMNS = [
   "published",
   "designer",
   "date_visited",
+  "status",
+  "submitted_at",
 ] as const;

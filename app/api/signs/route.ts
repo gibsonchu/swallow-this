@@ -8,6 +8,9 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const all = url.searchParams.get("all") === "1";
+  if (all && !(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const signs = await listSigns({ publishedOnly: !all });
   return NextResponse.json({ signs });
 }
@@ -37,6 +40,8 @@ export async function POST(request: Request) {
       date_collected: body.date_collected || body.date_visited || "",
       date_visited: body.date_visited || body.date_collected || "",
       published: Boolean(body.published),
+      status: body.status || (body.published ? "approved" : "draft"),
+      submitted_at: body.submitted_at || "",
     });
 
     return NextResponse.json(result);
@@ -76,6 +81,8 @@ export async function PATCH(request: Request) {
       date_collected: body.date_collected || body.date_visited || "",
       date_visited: body.date_visited || body.date_collected || "",
       published: Boolean(body.published),
+      status: body.status || (body.published ? "approved" : "draft"),
+      submitted_at: body.submitted_at || "",
     });
 
     return NextResponse.json(result);
