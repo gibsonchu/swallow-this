@@ -125,12 +125,14 @@ export async function listSigns(options: { publishedOnly?: boolean } = {}) {
 
   try {
     const response = await sheetsFetch(
-      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A2:T")}`,
+      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}`,
     );
     if (!response) return fallback;
 
     const data = (await response.json()) as { values?: string[][] };
-    const signs = (data.values ?? []).map(rowToSign);
+    const rows = data.values ?? [];
+    const dataRows = rows[0]?.[0] === "id" ? rows.slice(1) : rows;
+    const signs = dataRows.map(rowToSign);
     return options.publishedOnly ? signs.filter((sign) => sign.published) : signs;
   } catch (error) {
     console.warn("Google Sheets read failed; using mock signs.", error);
