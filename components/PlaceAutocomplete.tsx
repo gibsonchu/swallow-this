@@ -34,7 +34,6 @@ type PlacePrediction = {
 type PlaceAutocompleteElement = HTMLElement & {
   placeholder?: string;
   includedRegionCodes?: string[];
-  includedPrimaryTypes?: string[];
   locationBias?: { radius: number; center: { lat: number; lng: number } };
 };
 
@@ -118,7 +117,6 @@ export function PlaceAutocomplete({
         const autocomplete = new PlaceAutocompleteElement();
         autocomplete.placeholder = "Search NYC restaurants";
         autocomplete.includedRegionCodes = ["us"];
-        autocomplete.includedPrimaryTypes = ["restaurant", "cafe", "bar", "bakery", "meal_takeaway"];
         autocomplete.locationBias = { radius: 25000, center: { lat: 40.7128, lng: -74.006 } };
         autocomplete.className = "block w-full";
 
