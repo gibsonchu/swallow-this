@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { BulkUploadQueue } from "@/components/BulkUploadQueue";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlaceAutocomplete } from "@/components/PlaceAutocomplete";
+import type { SignRecord } from "@/types/sign";
 
 type UploadState = {
   originalUrl: string;
@@ -10,8 +10,26 @@ type UploadState = {
   warning?: string;
 };
 
-const initialForm = {
-  sign_title: "",
+type SignForm = {
+  id?: string;
+  restaurant_name: string;
+  designer: string;
+  place_id: string;
+  formatted_address: string;
+  latitude: string;
+  longitude: string;
+  google_maps_url: string;
+  borough: string;
+  neighborhood: string;
+  notes: string;
+  tags: string;
+  date_collected: string;
+  date_visited: string;
+  published: boolean;
+};
+
+const today = new Date().toISOString().slice(0, 10);
+const initialForm: SignForm = {
   restaurant_name: "",
   designer: "",
   place_id: "",
@@ -23,23 +41,60 @@ const initialForm = {
   neighborhood: "",
   notes: "",
   tags: "",
-  date_collected: new Date().toISOString().slice(0, 10),
-  date_visited: new Date().toISOString().slice(0, 10),
+  date_collected: today,
+  date_visited: today,
   published: false,
 };
 
+function formFromSign(sign: SignRecord): SignForm {
+  return {
+    id: sign.id,
+    restaurant_name: sign.restaurant_name || "",
+    designer: sign.designer || "",
+    place_id: sign.place_id || "",
+    formatted_address: sign.formatted_address || "",
+    latitude: sign.latitude || "",
+    longitude: sign.longitude || "",
+    google_maps_url: sign.google_maps_url || "",
+    borough: sign.borough || "",
+    neighborhood: sign.neighborhood || "",
+    notes: sign.notes || "",
+    tags: sign.tags || "",
+    date_collected: sign.date_collected || sign.date_visited || today,
+    date_visited: sign.date_visited || sign.date_collected || today,
+    published: Boolean(sign.published),
+  };
+}
+
 export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string }) {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState<SignForm>(initialForm);
   const [upload, setUpload] = useState<UploadState | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
-  const [queue, setQueue] = useState<Array<{ name: string; originalUrl?: string; processedUrl?: string; status: string }>>([]);
+  const [signs, setSigns] = useState<SignRecord[]>([]);
 
   const imageToShow = upload?.processedUrl || upload?.originalUrl;
+  const editing = Boolean(form.id);
+  const disabled = useMemo(() => Boolean(busy), [busy]);
 
-  const setField = (field: string, value: string | boolean) => {
+  const loadSigns = useCallback(async () => {
+    const response = await fetch("/api/signs?all=1");
+    const result = await response.json();
+    setSigns(result.signs || []);
+  }, []);
+
+  useEffect(() => {
+    void loadSigns();
+  }, [loadSigns]);
+
+  const setField = (field: keyof SignForm, value: string | boolean) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setForm({ ...initialForm, date_collected: today, date_visited: today });
+    setUpload(null);
+    setMessage("");
   };
 
   const handlePlaceSelected = useCallback((place: {
@@ -53,23 +108,22 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     setForm((current) => ({ ...current, ...place }));
   }, []);
 
-  const uploadFile = useCallback(async (nextFile: File) => {
+  const uploadFile = async (nextFile: File) => {
     setBusy("Uploading");
+    setMessage("");
     const data = new FormData();
     data.append("file", nextFile);
 
     const response = await fetch("/api/upload", { method: "POST", body: data });
     const result = await response.json();
+    setBusy("");
     if (!response.ok) throw new Error(result.error || "Upload failed");
     setUpload({ originalUrl: result.url, processedUrl: "", warning: result.warning });
-    setBusy("");
     return result.url as string;
-  }, []);
+  };
 
   const handleSingleFile = async (nextFile: File | undefined) => {
     if (!nextFile) return;
-    setFile(nextFile);
-    setMessage("");
     try {
       await uploadFile(nextFile);
     } catch (error) {
@@ -79,20 +133,23 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   };
 
   const saveSign = async () => {
-    if (!upload?.originalUrl) {
+    const originalUrl = upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_original_url;
+    const processedUrl = upload?.processedUrl || upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_processed_url;
+
+    if (!originalUrl) {
       setMessage("Upload an image before saving.");
       return;
     }
 
-    setBusy("Saving");
+    setBusy(editing ? "Updating" : "Saving");
     const response = await fetch("/api/signs", {
-      method: "POST",
+      method: editing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
         date_collected: form.date_visited,
-        image_original_url: upload.originalUrl,
-        image_processed_url: upload.processedUrl || upload.originalUrl,
+        image_original_url: originalUrl,
+        image_processed_url: processedUrl || originalUrl,
       }),
     });
     const result = await response.json();
@@ -103,67 +160,46 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       return;
     }
 
-    setMessage(result.warning || `Saved to Google Sheets${result.sign?.id ? `: ${result.sign.id}` : "."}`);
-    setForm(initialForm);
-    setUpload(null);
-    setFile(null);
+    setMessage(result.warning || `${editing ? "Updated" : "Saved"} in Google Sheets.`);
+    resetForm();
+    await loadSigns();
   };
 
-  const handleBulk = async (files: FileList | null) => {
-    if (!files?.length) return;
-    const items = Array.from(files).map((item) => ({ name: item.name, status: "Queued" }));
-    setQueue(items);
+  const editSign = (sign: SignRecord) => {
+    setForm(formFromSign(sign));
+    setUpload({ originalUrl: sign.image_original_url, processedUrl: sign.image_processed_url });
+    setMessage("");
+  };
 
-    for (const [index, nextFile] of Array.from(files).entries()) {
-      setQueue((current) =>
-        current.map((item, itemIndex) =>
-          itemIndex === index ? { ...item, status: "Uploading original" } : item,
-        ),
-      );
+  const deleteCurrentSign = async () => {
+    if (!form.id) return;
+    setBusy("Deleting");
+    const response = await fetch(`/api/signs?id=${encodeURIComponent(form.id)}`, { method: "DELETE" });
+    const result = await response.json();
+    setBusy("");
 
-      try {
-        const originalUrl = await uploadFile(nextFile);
-        setQueue((current) =>
-          current.map((item, itemIndex) =>
-            itemIndex === index ? { ...item, originalUrl, status: "Ready for metadata" } : item,
-          ),
-        );
-      } catch {
-        setQueue((current) =>
-          current.map((item, itemIndex) =>
-            itemIndex === index ? { ...item, status: "Upload failed" } : item,
-          ),
-        );
-      }
+    if (!response.ok) {
+      setMessage(result.error || "Delete failed");
+      return;
     }
-  };
 
-  const disabled = useMemo(() => Boolean(busy), [busy]);
+    resetForm();
+    setMessage("Removed from Google Sheets.");
+    await loadSigns();
+  };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
-      <section className="grid gap-5">
-        <div className="grid gap-2">
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Single image</span>
-            <input
-              className="border border-black/15 bg-white p-2"
-              type="file"
-              accept="image/*"
-              onChange={(event) => handleSingleFile(event.target.files?.[0])}
-            />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Bulk images</span>
-            <input
-              className="border border-black/15 bg-white p-2"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(event) => handleBulk(event.target.files)}
-            />
-          </label>
-        </div>
+    <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)_360px]">
+      <section className="grid content-start gap-4">
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Image</span>
+          <input
+            className="border border-black/15 bg-white p-2"
+            type="file"
+            accept="image/*"
+            onChange={(event) => handleSingleFile(event.target.files?.[0])}
+          />
+        </label>
 
         <div className="aspect-[4/5] border border-black/10 bg-white">
           {imageToShow ? (
@@ -175,20 +211,24 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
             </div>
           )}
         </div>
-
-        <BulkUploadQueue items={queue} />
       </section>
 
       <section className="grid content-start gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">{editing ? "Edit sign" : "New sign"}</h2>
+          {editing && (
+            <button className="border border-black/15 px-3 py-1 text-sm hover:border-black" type="button" onClick={resetForm}>
+              New
+            </button>
+          )}
+        </div>
+
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Restaurant name</span>
           <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
         </label>
 
-        <PlaceAutocomplete
-          apiKey={googleMapsApiKey}
-          onPlaceSelected={handlePlaceSelected}
-        />
+        <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
@@ -206,7 +246,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <input className="border border-black/15 bg-white px-3 py-2" value={form.google_maps_url} onChange={(event) => setField("google_maps_url", event.target.value)} />
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <label className="grid gap-1 text-sm">
             <span className="font-medium">Designer</span>
             <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
@@ -241,22 +281,53 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           Published
         </label>
 
-        <button
-          className="border border-black bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
-          type="button"
-          disabled={!upload?.originalUrl || disabled}
-          onClick={saveSign}
-        >
-          Save sign
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="flex-1 border border-black bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+            type="button"
+            disabled={(!upload?.originalUrl && !editing) || disabled}
+            onClick={saveSign}
+          >
+            {editing ? "Update sign" : "Save sign"}
+          </button>
+          {editing && (
+            <button className="border border-black/15 px-4 py-2 text-sm hover:border-black" type="button" disabled={disabled} onClick={deleteCurrentSign}>
+              Delete
+            </button>
+          )}
+        </div>
 
-        {!upload?.originalUrl && !busy && (
+        {!upload?.originalUrl && !editing && !busy && (
           <p className="font-mono text-xs uppercase text-black/45">Upload an image before saving.</p>
         )}
-
         {(busy || message || upload?.warning) && (
           <p className="font-mono text-xs uppercase text-black/55">{busy || message || upload?.warning}</p>
         )}
+      </section>
+
+      <section className="max-h-[78vh] overflow-auto border border-black/10 bg-white">
+        <div className="sticky top-0 border-b border-black/10 bg-white p-3 font-mono text-[11px] uppercase text-black/45">
+          {signs.length} signs
+        </div>
+        <div className="divide-y divide-black/10">
+          {signs.map((sign) => (
+            <button
+              key={sign.id}
+              className="grid w-full grid-cols-[56px_1fr] gap-3 p-3 text-left hover:bg-black/[0.03]"
+              type="button"
+              onClick={() => editSign(sign)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={sign.image_processed_url || sign.image_original_url} alt="" className="h-14 w-14 object-contain" />
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-medium">{sign.restaurant_name || "Untitled sign"}</span>
+                <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
+                  {[sign.borough || "Unknown", sign.published ? "Published" : "Draft"].join(" / ")}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
       </section>
     </div>
   );

@@ -9,18 +9,17 @@ export function SignCard({ sign }: { sign: SignRecord }) {
   return (
     <Link
       href={`/sign/${sign.id}`}
-      className="group relative block overflow-hidden border border-black/10 bg-[#f8f4ea] focus:outline-none focus:ring-2 focus:ring-black"
+      className="archive-card group block text-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-black"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt={label}
-        className="aspect-[4/5] w-full object-contain p-1.5 transition duration-150 group-hover:scale-[1.02]"
+        className="mx-auto aspect-[4/5] max-h-[230px] w-full object-contain drop-shadow-sm transition duration-200 group-hover:scale-[1.04]"
       />
-      <div className="absolute inset-x-0 bottom-0 translate-y-1 bg-[#fbf7ee]/95 p-2 text-[11px] leading-tight opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100 sm:text-xs">
-        <p className="font-medium text-black">{label}</p>
-        {sign.designer && <p className="mt-1 text-black/70">Designer: {sign.designer}</p>}
-        <p className="font-mono text-[10px] uppercase tracking-normal text-black/55">
+      <div className="pt-3 text-[12px] leading-tight opacity-0 transition duration-200 group-hover:opacity-100 group-focus:opacity-100">
+        <p className="font-semibold text-black">{label}</p>
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-normal text-black/55">
           {[sign.borough, dateVisited].filter(Boolean).join(" / ") || "Date unknown"}
         </p>
       </div>

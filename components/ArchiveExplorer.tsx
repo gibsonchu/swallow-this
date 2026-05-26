@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { SignGrid } from "@/components/SignGrid";
-import { SignMap } from "@/components/SignMap";
 import type { SignRecord } from "@/types/sign";
 
 const BOROUGH_ORDER = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "Unknown"];
@@ -24,31 +24,46 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   );
 
   return (
-    <>
-      <nav className="grid gap-3 border-b border-black/10 px-3 py-3 sm:grid-cols-[1fr_auto] sm:items-center sm:px-5">
-        <div className="flex flex-wrap gap-1">
+    <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[260px_1fr]">
+      <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r md:p-7">
+        <h1 className="max-w-[10rem] text-2xl font-semibold leading-[0.95] tracking-normal md:text-3xl">
+          Choking Hazard Signs
+        </h1>
+        <p className="mt-4 max-w-[13rem] text-sm leading-5 text-black/55">
+          An archive of choking hazard signs around New York City.
+        </p>
+
+        <nav className="mt-8 grid gap-8">
+          <div className="grid gap-1">
+            <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Borough</p>
           {boroughs.map((item) => (
             <button
               key={item}
               type="button"
-              className={`border px-2 py-1 font-mono text-[11px] uppercase ${
-                item === borough ? "border-black bg-black text-[#fbf7ee]" : "border-black/15 bg-transparent text-black/60"
-              }`}
+                className={`w-fit text-left text-lg leading-tight ${
+                  item === borough ? "font-semibold text-black" : "font-semibold text-black/45 hover:text-black"
+                }`}
               onClick={() => setBorough(item)}
             >
               {item}
             </button>
           ))}
-        </div>
-        <div className="flex gap-3 font-mono text-[11px] uppercase text-black/50">
-          <span>{filteredSigns.length} visible</span>
-          <a className="hover:text-black" href="#map">
-            Map
-          </a>
-        </div>
-      </nav>
-      <SignGrid signs={filteredSigns} />
-      <SignMap signs={filteredSigns} />
-    </>
+          </div>
+
+          <div className="grid gap-1">
+            <p className="mb-2 font-mono text-[11px] uppercase text-black/40">View</p>
+            <span className="text-lg font-semibold text-black">Archive</span>
+            <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">
+              Map
+            </Link>
+          </div>
+
+          <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
+        </nav>
+      </aside>
+      <section className="px-4 py-6 md:px-8 md:py-10">
+        <SignGrid signs={filteredSigns} />
+      </section>
+    </div>
   );
 }

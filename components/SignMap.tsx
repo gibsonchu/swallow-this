@@ -29,14 +29,14 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     .filter((item): item is { sign: SignRecord; position: { x: number; y: number } } => Boolean(item.position));
 
   return (
-    <section id="map" className="border-t border-black/10 bg-[#f7f1e5]">
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="relative min-h-[380px] overflow-hidden border-b border-black/10 bg-[#efe8d8] lg:border-b-0 lg:border-r">
+    <section className="h-full bg-[#fdfdf9]">
+      <div className="grid h-full gap-0 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="relative min-h-[calc(100vh-74px)] overflow-hidden border-b border-black/10 bg-[#f4f4ee] lg:border-b-0 lg:border-r">
           <div className="absolute inset-0 opacity-80">
-            <div className="absolute left-[16%] top-[12%] h-[78%] w-[22%] rotate-[8deg] border border-black/20 bg-white/35" />
-            <div className="absolute left-[39%] top-[30%] h-[42%] w-[18%] rotate-[-12deg] border border-black/20 bg-white/30" />
-            <div className="absolute left-[55%] top-[18%] h-[60%] w-[26%] rotate-[5deg] border border-black/20 bg-white/25" />
-            <div className="absolute left-[28%] top-[72%] h-[18%] w-[28%] rotate-[-5deg] border border-black/15 bg-white/20" />
+            <div className="absolute left-[16%] top-[12%] h-[78%] w-[22%] rotate-[8deg] border border-black/15 bg-white/60" />
+            <div className="absolute left-[39%] top-[30%] h-[42%] w-[18%] rotate-[-12deg] border border-black/15 bg-white/45" />
+            <div className="absolute left-[55%] top-[18%] h-[60%] w-[26%] rotate-[5deg] border border-black/15 bg-white/45" />
+            <div className="absolute left-[28%] top-[72%] h-[18%] w-[28%] rotate-[-5deg] border border-black/10 bg-white/35" />
           </div>
           <div className="absolute left-3 top-3 z-10 font-mono text-[11px] uppercase text-black/50">
             Approximate NYC map
@@ -45,12 +45,19 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
             <Link
               key={sign.id}
               href={`/sign/${sign.id}`}
-              className="group absolute z-20 grid h-5 w-5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-black bg-[#fbf7ee] text-[10px] font-semibold leading-none shadow-sm hover:z-30 hover:bg-black hover:text-white"
+              className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 hover:z-30"
               style={{ left: `${position.x}%`, top: `${position.y}%` }}
               title={sign.restaurant_name || `Sign ${index + 1}`}
             >
-              {index + 1}
-              <span className="pointer-events-none absolute left-1/2 top-6 hidden w-44 -translate-x-1/2 border border-black bg-[#fbf7ee] p-2 text-left text-[11px] font-normal leading-tight text-black shadow-sm group-hover:block">
+              <span className="grid h-16 w-16 place-items-center rounded-full border border-black bg-white shadow-sm transition group-hover:scale-125">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sign.image_processed_url || sign.image_original_url}
+                  alt=""
+                  className="h-12 w-12 rounded-full object-contain"
+                />
+              </span>
+              <span className="pointer-events-none absolute left-1/2 top-20 hidden w-44 -translate-x-1/2 border border-black bg-white p-2 text-left text-[11px] font-normal leading-tight text-black shadow-sm group-hover:block">
                 <span className="block font-medium">{sign.restaurant_name || "Unknown restaurant"}</span>
                 <span className="mt-1 block font-mono uppercase text-black/55">
                   {sign.borough || "Borough unknown"}
@@ -65,8 +72,8 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           )}
         </div>
 
-        <div className="max-h-[520px] overflow-auto bg-[#fbf7ee]">
-          <div className="sticky top-0 border-b border-black/10 bg-[#fbf7ee] p-3 font-mono text-[11px] uppercase text-black/50">
+        <div className="max-h-[calc(100vh-74px)] overflow-auto bg-[#fdfdf9]">
+          <div className="sticky top-0 border-b border-black/10 bg-[#fdfdf9] p-3 font-mono text-[11px] uppercase text-black/50">
             {mappedSigns.length} mapped signs
           </div>
           <div className="divide-y divide-black/10">

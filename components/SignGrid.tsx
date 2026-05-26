@@ -11,7 +11,7 @@ export function SignGrid({ signs }: { signs: SignRecord[] }) {
   }
 
   return (
-    <div className="grid grid-cols-3 gap-px sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+    <div className="archive-grid grid grid-cols-2 gap-x-10 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {signs.map((sign) => (
         <SignCard key={sign.id} sign={sign} />
       ))}

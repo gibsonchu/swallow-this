@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf7ee;
+  --background: #fdfdf9;
   --foreground: #151515;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", "Space Grotesk Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-space-grotesk), Arial, Helvetica, sans-serif;
 }
 
 button,
@@ -27,5 +27,10 @@ textarea {
 
 ::selection {
   background: #151515;
-  color: #fbf7ee;
+  color: #fdfdf9;
+}
+
+.archive-grid:has(.archive-card:hover) .archive-card:not(:hover) {
+  filter: blur(5px);
+  opacity: 0.24;
 }

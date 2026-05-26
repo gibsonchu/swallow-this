@@ -23,7 +23,7 @@ export default async function SignDetailPage({
     .filter(Boolean);
 
   return (
-    <main className="min-h-screen bg-[#fbf7ee] text-[#151515]">
+    <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
       <header className="border-b border-black/10 px-4 py-3">
         <Link className="font-mono text-xs uppercase text-black/55 hover:text-black" href="/">
           Back to archive

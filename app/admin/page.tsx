@@ -8,7 +8,7 @@ export default async function AdminPage() {
 
   if (!authenticated) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#fbf7ee] px-4 text-[#151515]">
+      <main className="flex min-h-screen items-center justify-center bg-[#fdfdf9] px-4 text-[#151515]">
         <form
           className="grid w-full max-w-sm gap-4 border border-black/10 bg-white p-5"
           action="/api/admin/login"
@@ -31,11 +31,11 @@ export default async function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fbf7ee] px-4 py-5 text-[#151515] md:px-6">
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
+    <main className="min-h-screen bg-[#fdfdf9] px-4 py-5 text-[#151515] md:px-7">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
         <div>
-          <h1 className="text-3xl font-semibold">Choking Hazard Signs admin</h1>
-          <p className="mt-1 text-sm text-black/60">Upload, cut out, annotate, and publish signs.</p>
+          <h1 className="text-3xl font-semibold leading-none">Choking Hazard Signs admin</h1>
+          <p className="mt-2 text-sm text-black/55">Upload, annotate, edit, and publish signs.</p>
         </div>
         <form action="/api/admin/logout" method="post">
           <button className="border border-black/20 px-3 py-2 text-sm hover:border-black" type="submit">

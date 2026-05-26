@@ -116,6 +116,28 @@ function signToRow(sign: SignRecord) {
   );
 }
 
+async function getSheetRows() {
+  const response = await sheetsFetch(
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}`,
+  );
+  if (!response) return [];
+
+  const data = (await response.json()) as { values?: string[][] };
+  return data.values ?? [];
+}
+
+function rowsToSigns(rows: string[][]) {
+  const dataRows = rows[0]?.[0] === "id" ? rows.slice(1) : rows;
+  return dataRows
+    .map(rowToSign)
+    .filter((sign) => sign.id || sign.image_original_url || sign.restaurant_name);
+}
+
+function rowNumberForId(rows: string[][], id: string) {
+  const index = rows.findIndex((row) => row[0] === id);
+  return index === -1 ? null : index + 1;
+}
+
 export async function listSigns(options: { publishedOnly?: boolean } = {}) {
   const fallback = options.publishedOnly ? mockSigns.filter((sign) => sign.published) : mockSigns;
 
@@ -124,17 +146,7 @@ export async function listSigns(options: { publishedOnly?: boolean } = {}) {
   }
 
   try {
-    const response = await sheetsFetch(
-      `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}`,
-    );
-    if (!response) return fallback;
-
-    const data = (await response.json()) as { values?: string[][] };
-    const rows = data.values ?? [];
-    const dataRows = rows[0]?.[0] === "id" ? rows.slice(1) : rows;
-    const signs = dataRows
-      .map(rowToSign)
-      .filter((sign) => sign.id || sign.image_original_url || sign.restaurant_name);
+    const signs = rowsToSigns(await getSheetRows());
     return options.publishedOnly ? signs.filter((sign) => sign.published) : signs;
   } catch (error) {
     console.warn("Google Sheets read failed; using mock signs.", error);
@@ -162,11 +174,8 @@ export async function createSign(input: SignInput) {
     return { sign, stored: false, warning: "Google Sheets env vars are missing; returning mock save." };
   }
 
-  const rowsResponse = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:T")}`,
-  );
-  const rowsData = rowsResponse ? ((await rowsResponse.json()) as { values?: string[][] }) : { values: [] };
-  const nextRowNumber = (rowsData.values ?? []).length + 1;
+  const rows = await getSheetRows();
+  const nextRowNumber = rows.length + 1;
 
   const writeResponse = await sheetsFetch(
     `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(
@@ -182,4 +191,47 @@ export async function createSign(input: SignInput) {
   const writeData = writeResponse ? ((await writeResponse.json()) as { updatedRange?: string }) : {};
 
   return { sign, stored: true, updatedRange: writeData.updatedRange };
+}
+
+export async function updateSign(id: string, input: Partial<SignInput>) {
+  const rows = await getSheetRows();
+  const rowNumber = rowNumberForId(rows, id);
+  if (!rowNumber) throw new Error("Sign not found");
+
+  const existing = rowToSign(rows[rowNumber - 1]);
+  const now = new Date().toISOString();
+  const sign: SignRecord = {
+    ...existing,
+    ...input,
+    id,
+    image_processed_url: input.image_processed_url || existing.image_processed_url || input.image_original_url || existing.image_original_url,
+    created_at: existing.created_at,
+    updated_at: now,
+    published: Boolean(input.published),
+  };
+
+  const writeResponse = await sheetsFetch(
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:T${rowNumber}`)}?valueInputOption=USER_ENTERED`,
+    {
+      method: "PUT",
+      body: JSON.stringify({ values: [signToRow(sign)] }),
+    },
+  );
+  const writeData = writeResponse ? ((await writeResponse.json()) as { updatedRange?: string }) : {};
+
+  return { sign, stored: true, updatedRange: writeData.updatedRange };
+}
+
+export async function deleteSign(id: string) {
+  const rows = await getSheetRows();
+  const rowNumber = rowNumberForId(rows, id);
+  if (!rowNumber) throw new Error("Sign not found");
+
+  const sign = rowToSign(rows[rowNumber - 1]);
+  await sheetsFetch(
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:T${rowNumber}`)}:clear`,
+    { method: "POST", body: JSON.stringify({}) },
+  );
+
+  return { sign, deleted: true };
 }
