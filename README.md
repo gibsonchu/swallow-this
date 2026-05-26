@@ -67,7 +67,7 @@ The app reads rows on the `Signs` tab and writes new signs to explicit rows. Add
 - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: Service account email for Sheets access.
 - `GOOGLE_PRIVATE_KEY`: Service account private key.
 - `GOOGLE_SHEET_ID`: Spreadsheet ID for the `Signs` sheet.
-- `GOOGLE_MAPS_API_KEY`: Used by the admin Places Autocomplete box. Restrict this key to your deployed/admin domains in Google Cloud.
+- `GOOGLE_MAPS_API_KEY`: Used in the browser by the admin Places Autocomplete box. Enable Maps JavaScript API and Places API, then add website referrers for local and deployed URLs such as `http://localhost:3000/*` and `https://choking-hazard-signs.vercel.app/*`.
 - `BLOB_READ_WRITE_TOKEN`: Vercel Blob token for persistent public image storage.
 ## Routes
 
