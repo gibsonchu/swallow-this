@@ -18,7 +18,7 @@ type SubmissionForm = {
   designer_url: string;
   tags: string;
   date_visited: string;
-  usability_rating: string;
+  restaurants_using_design: string;
   submitter_name: string;
 };
 
@@ -39,7 +39,7 @@ const initialForm: SubmissionForm = {
   designer_url: "",
   tags: "",
   date_visited: today,
-  usability_rating: "",
+  restaurants_using_design: "",
   submitter_name: "",
 };
 
@@ -49,6 +49,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
   const [previewUrl, setPreviewUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [placeResetKey, setPlaceResetKey] = useState(0);
 
   const canSubmit = useMemo(() => Boolean(file && form.restaurant_name && !busy), [busy, file, form.restaurant_name]);
 
@@ -100,6 +101,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
     setForm({ ...initialForm, date_visited: today });
     setFile(null);
     setPreviewUrl("");
+    setPlaceResetKey((key) => key + 1);
     setMessage(result.warning || "Submitted. It Will Show Up After Review.");
   };
 
@@ -113,7 +115,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
         <div className="aspect-[4/5] border border-black/10 bg-white">
           {previewUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={previewUrl} alt="Submission preview" className="h-full w-full object-contain p-3" />
+            <img src={previewUrl} alt="Submission preview" className="archive-image h-full w-full object-contain object-center p-3" />
           ) : (
             <div className="flex h-full items-center justify-center p-6 text-center text-sm text-black/40">
               Add The Sign Photo.
@@ -138,7 +140,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
           />
         </label>
 
-        <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
+        <PlaceAutocomplete apiKey={googleMapsApiKey} resetKey={placeResetKey} onPlaceSelected={handlePlaceSelected} />
 
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Google Maps URL</span>
@@ -149,11 +151,18 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
           <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_website_url} onChange={(event) => setField("restaurant_website_url", event.target.value)} />
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
             <span className="font-medium">Designer</span>
             <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
           </label>
+          <label className="grid gap-1 text-sm">
+            <span className="font-medium">Designer Website URL</span>
+            <input className="border border-black/15 bg-white px-3 py-2" value={form.designer_url} onChange={(event) => setField("designer_url", event.target.value)} />
+          </label>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="grid gap-1 text-sm">
             <span className="font-medium">Borough</span>
             <select className="border border-black/15 bg-white px-3 py-2" value={form.borough} onChange={(event) => setField("borough", event.target.value)}>
@@ -163,6 +172,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
               <option value="Queens">Queens</option>
               <option value="Bronx">Bronx</option>
               <option value="Staten Island">Staten Island</option>
+              <option value="New Jersey">New Jersey</option>
             </select>
           </label>
           <label className="grid gap-1 text-sm">
@@ -170,10 +180,6 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
             <input className="border border-black/15 bg-white px-3 py-2" type="date" value={form.date_visited} onChange={(event) => setField("date_visited", event.target.value)} />
           </label>
         </div>
-        <label className="grid gap-1 text-sm">
-          <span className="font-medium">Designer Website URL</span>
-          <input className="border border-black/15 bg-white px-3 py-2" value={form.designer_url} onChange={(event) => setField("designer_url", event.target.value)} />
-        </label>
 
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Neighborhood</span>
@@ -181,17 +187,12 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
         </label>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Usability Rating</span>
-          <select className="border border-black/15 bg-white px-3 py-2" value={form.usability_rating} onChange={(event) => setField("usability_rating", event.target.value)}>
-            <option value="">Unrated</option>
-            <option value="1">🌟 Non-Functional</option>
-            <option value="2">🌟🌟 Marginal</option>
-            <option value="3">🌟🌟🌟 Usable</option>
-          </select>
+          <span className="font-medium">List Of Restaurants Also Using This Design</span>
+          <textarea className="min-h-20 border border-black/15 bg-white px-3 py-2" value={form.restaurants_using_design} onChange={(event) => setField("restaurants_using_design", event.target.value)} />
         </label>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Usability Reasoning</span>
+          <span className="font-medium">Notes</span>
           <textarea className="min-h-24 border border-black/15 bg-white px-3 py-2" value={form.notes} onChange={(event) => setField("notes", event.target.value)} />
         </label>
 

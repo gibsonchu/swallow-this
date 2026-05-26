@@ -1,3 +1,4 @@
+import { AdminHeaderActions } from "@/components/AdminHeaderActions";
 import { AdminUploader } from "@/components/AdminUploader";
 import { isAdminAuthenticated } from "@/lib/auth";
 
@@ -37,11 +38,7 @@ export default async function AdminPage() {
           <h1 className="display-title text-3xl leading-none">Choking Hazard Signs Admin</h1>
           <p className="mt-2 text-sm text-black/55">Upload, annotate, edit, and publish signs.</p>
         </div>
-        <form action="/api/admin/logout" method="post">
-          <button className="border border-black/20 px-3 py-2 text-sm hover:border-black" type="submit">
-            Log out
-          </button>
-        </form>
+        <AdminHeaderActions />
       </header>
       <AdminUploader googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY} />
     </main>

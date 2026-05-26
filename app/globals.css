@@ -37,6 +37,10 @@ textarea {
   opacity: 0.24;
 }
 
+.archive-image {
+  filter: brightness(1.08) contrast(1.04) saturate(1.03);
+}
+
 .display-title {
   font-family: var(--font-archivo-black), "Arial Black", ui-sans-serif, system-ui, sans-serif;
   text-transform: uppercase;

@@ -23,7 +23,7 @@ export type SignRecord = {
   published: boolean;
   status: string;
   submitted_at: string;
-  usability_rating: string;
+  restaurants_using_design: string;
   submitter_name: string;
   featured: boolean;
 };
@@ -57,7 +57,7 @@ export const SHEET_COLUMNS = [
   "status",
   "submitted_at",
   "designer_url",
-  "usability_rating",
+  "restaurants_using_design",
   "submitter_name",
   "featured",
 ] as const;

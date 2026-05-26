@@ -113,7 +113,7 @@ function rowToSign(row: string[]): SignRecord {
     submitted_at: record.submitted_at || "",
     restaurant_website_url: record.restaurant_website_url || "",
     designer_url: record.designer_url || "",
-    usability_rating: record.usability_rating || "",
+    restaurants_using_design: record.restaurants_using_design || "",
     submitter_name: record.submitter_name || DEFAULT_SUBMITTER_NAME,
     featured: parseBoolean(record.featured),
   };
@@ -206,7 +206,7 @@ export async function createSign(input: SignInput) {
     submitted_at: input.submitted_at || "",
     restaurant_website_url: input.restaurant_website_url || "",
     designer_url: input.designer_url || "",
-    usability_rating: input.usability_rating || "",
+    restaurants_using_design: input.restaurants_using_design || "",
     submitter_name: input.submitter_name || DEFAULT_SUBMITTER_NAME,
     featured: Boolean(input.featured),
   };
@@ -254,7 +254,7 @@ export async function updateSign(id: string, input: Partial<SignInput>) {
     submitted_at: input.submitted_at || existing.submitted_at || "",
     restaurant_website_url: input.restaurant_website_url || existing.restaurant_website_url || "",
     designer_url: input.designer_url || existing.designer_url || "",
-    usability_rating: input.usability_rating || existing.usability_rating || "",
+    restaurants_using_design: input.restaurants_using_design || existing.restaurants_using_design || "",
     submitter_name: input.submitter_name || existing.submitter_name || DEFAULT_SUBMITTER_NAME,
     featured: Boolean(input.featured),
   };

@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       published: false,
       status: "pending",
       submitted_at: now,
-      usability_rating: text(form, "usability_rating"),
+      restaurants_using_design: text(form, "restaurants_using_design"),
       submitter_name: text(form, "submitter_name") || "Gibson Chu",
       featured: false,
     });

@@ -30,7 +30,7 @@ type SignForm = {
   published: boolean;
   status: string;
   submitted_at: string;
-  usability_rating: string;
+  restaurants_using_design: string;
   submitter_name: string;
   featured: boolean;
 };
@@ -55,7 +55,7 @@ const initialForm: SignForm = {
   published: false,
   status: "draft",
   submitted_at: "",
-  usability_rating: "",
+  restaurants_using_design: "",
   submitter_name: "Gibson Chu",
   featured: false,
 };
@@ -81,7 +81,7 @@ function formFromSign(sign: SignRecord): SignForm {
     published: Boolean(sign.published),
     status: sign.status || (sign.published ? "approved" : "draft"),
     submitted_at: sign.submitted_at || "",
-    usability_rating: sign.usability_rating || "",
+    restaurants_using_design: sign.restaurants_using_design || "",
     submitter_name: sign.submitter_name || "Gibson Chu",
     featured: Boolean(sign.featured),
   };
@@ -94,6 +94,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
   const [signs, setSigns] = useState<SignRecord[]>([]);
+  const [placeResetKey, setPlaceResetKey] = useState(0);
 
   const imageToShow = upload?.processedUrl || upload?.originalUrl;
   const editing = Boolean(form.id);
@@ -108,19 +109,26 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     setSigns(result.signs || []);
   }, []);
 
-  useEffect(() => {
-    queueMicrotask(() => void loadSigns());
-  }, [loadSigns]);
-
   const setField = (field: keyof SignForm, value: string | boolean) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setForm({ ...initialForm, date_collected: today, date_visited: today });
     setUpload(null);
     setMessage("");
-  };
+    setPlaceResetKey((key) => key + 1);
+  }, []);
+
+  useEffect(() => {
+    queueMicrotask(() => void loadSigns());
+  }, [loadSigns]);
+
+  useEffect(() => {
+    const handleNewSign = () => resetForm();
+    window.addEventListener("admin:new-sign", handleNewSign);
+    return () => window.removeEventListener("admin:new-sign", handleNewSign);
+  }, [resetForm]);
 
   const handlePlaceSelected = useCallback((place: {
     place_id: string;
@@ -262,7 +270,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         <div className="aspect-[4/5] border border-black/10 bg-white">
           {imageToShow ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageToShow} alt="Upload preview" className="h-full w-full object-contain p-3" />
+            <img src={imageToShow} alt="Upload preview" className="archive-image h-full w-full object-contain object-center p-3" />
           ) : (
             <div className="flex h-full items-center justify-center p-6 text-center text-sm text-black/40">
               Image preview
@@ -291,7 +299,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <input className="border border-black/15 bg-white px-3 py-2" value={form.submitter_name} onChange={(event) => setField("submitter_name", event.target.value)} />
         </label>
 
-        <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
+        <PlaceAutocomplete apiKey={googleMapsApiKey} resetKey={placeResetKey} onPlaceSelected={handlePlaceSelected} />
 
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Google Maps URL</span>
@@ -304,10 +312,6 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
 
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="grid gap-1 text-sm">
-            <span className="font-medium">Designer</span>
-            <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
-          </label>
-          <label className="grid gap-1 text-sm">
             <span className="font-medium">Borough</span>
             <select className="border border-black/15 bg-white px-3 py-2" value={form.borough} onChange={(event) => setField("borough", event.target.value)}>
               <option value="">Unknown</option>
@@ -316,6 +320,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               <option value="Queens">Queens</option>
               <option value="Bronx">Bronx</option>
               <option value="Staten Island">Staten Island</option>
+              <option value="New Jersey">New Jersey</option>
             </select>
           </label>
           <label className="grid gap-1 text-sm">
@@ -323,23 +328,25 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
             <input className="border border-black/15 bg-white px-3 py-2" type="date" value={form.date_visited} onChange={(event) => setField("date_visited", event.target.value)} />
           </label>
         </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1 text-sm">
+            <span className="font-medium">Designer</span>
+            <input className="border border-black/15 bg-white px-3 py-2" value={form.designer} onChange={(event) => setField("designer", event.target.value)} />
+          </label>
+          <label className="grid gap-1 text-sm">
+            <span className="font-medium">Designer Website URL</span>
+            <input className="border border-black/15 bg-white px-3 py-2" value={form.designer_url} onChange={(event) => setField("designer_url", event.target.value)} />
+          </label>
+        </div>
+
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Designer Website URL</span>
-          <input className="border border-black/15 bg-white px-3 py-2" value={form.designer_url} onChange={(event) => setField("designer_url", event.target.value)} />
+          <span className="font-medium">List Of Restaurants Also Using This Design</span>
+          <textarea className="min-h-20 border border-black/15 bg-white px-3 py-2" value={form.restaurants_using_design} onChange={(event) => setField("restaurants_using_design", event.target.value)} />
         </label>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Usability Rating</span>
-          <select className="border border-black/15 bg-white px-3 py-2" value={form.usability_rating} onChange={(event) => setField("usability_rating", event.target.value)}>
-            <option value="">Unrated</option>
-            <option value="1">🌟 Non-Functional</option>
-            <option value="2">🌟🌟 Marginal</option>
-            <option value="3">🌟🌟🌟 Usable</option>
-          </select>
-        </label>
-
-        <label className="grid gap-1 text-sm">
-          <span className="font-medium">Usability Reasoning</span>
+          <span className="font-medium">Notes</span>
           <textarea className="min-h-24 border border-black/15 bg-white px-3 py-2" value={form.notes} onChange={(event) => setField("notes", event.target.value)} />
         </label>
         <label className="grid gap-1 text-sm">
@@ -349,10 +356,6 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={form.published} onChange={(event) => setField("published", event.target.checked)} />
           Published
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={form.featured} onChange={(event) => setField("featured", event.target.checked)} />
-          Featured Sign
         </label>
         {form.status === "pending" && (
           <p className="border border-black/10 bg-white p-3 font-mono text-xs uppercase text-black/55">
@@ -417,7 +420,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               onClick={() => editSign(sign)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={sign.image_processed_url || sign.image_original_url} alt="" className="h-14 w-14 object-contain" />
+              <img src={sign.image_processed_url || sign.image_original_url} alt="" className="archive-image h-14 w-14 object-contain object-center" />
               <span className="min-w-0">
                 <span className="block truncate text-sm font-medium">{sign.restaurant_name || "Untitled Sign"}</span>
                 <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { SignGrid } from "@/components/SignGrid";
 import type { SignRecord } from "@/types/sign";
 
-const BOROUGH_ORDER = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "Unknown"];
+const BOROUGH_ORDER = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "New Jersey", "Unknown"];
 
 function boroughFor(sign: SignRecord) {
   return sign.borough || "Unknown";
@@ -15,15 +15,9 @@ function searchableText(sign: SignRecord) {
   return sign.restaurant_name.toLowerCase();
 }
 
-function stars(rating: string) {
-  const count = Number(rating);
-  return Number.isFinite(count) && count > 0 ? "🌟".repeat(Math.min(count, 3)) : "";
-}
-
 export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   const [borough, setBorough] = useState("All");
   const [query, setQuery] = useState("");
-  const featured = signs.find((sign) => sign.featured) || signs[0];
 
   const boroughs = useMemo(() => {
     const available = new Set(signs.map(boroughFor));
@@ -42,10 +36,6 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
       return matchesBorough && matchesQuery;
     });
   }, [borough, query, signs]);
-
-  const gridSigns = featured && !query.trim() && borough === "All"
-    ? filteredSigns.filter((sign) => sign.id !== featured.id)
-    : filteredSigns;
 
   return (
     <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
@@ -100,43 +90,11 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
       </aside>
 
       <section className="px-5 py-8 md:px-12 md:py-14">
-        {featured && !query.trim() && borough === "All" && (
-          <Link
-            className="mb-20 grid gap-10 border-b border-black/10 pb-14 md:grid-cols-[minmax(220px,380px)_minmax(0,1fr)]"
-            href={`/sign/${featured.id}`}
-          >
-            <div className="bg-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={featured.image_processed_url || featured.image_original_url}
-                alt={featured.restaurant_name || "Featured sign"}
-                className="mx-auto max-h-[460px] w-full object-contain p-3"
-              />
-            </div>
-            <div className="flex max-w-xl flex-col justify-end pb-2">
-              <p className="font-mono text-[11px] uppercase text-black/45">Featured Sign</p>
-              <h2 className="mt-4 text-4xl font-semibold leading-none md:text-6xl">
-                {featured.restaurant_name || "Unknown Restaurant"}
-              </h2>
-              <p className="mt-5 text-sm leading-6 text-black/60">
-                {[featured.borough, featured.date_visited || featured.date_collected].filter(Boolean).join(" / ") ||
-                  "Location pending"}
-              </p>
-              {stars(featured.usability_rating) && (
-                <p className="mt-4 text-lg leading-none">{stars(featured.usability_rating)}</p>
-              )}
-              {featured.notes && <p className="mt-5 max-w-md text-base leading-7 text-black/70">{featured.notes}</p>}
-            </div>
-          </Link>
-        )}
-
-        {gridSigns.length > 0 ? (
-          <SignGrid signs={gridSigns} />
+        {filteredSigns.length > 0 ? (
+          <SignGrid signs={filteredSigns} />
         ) : (
           <div className="border border-black/10 px-4 py-12 text-center text-sm text-black/60">
-            {featured && !query.trim() && borough === "All"
-              ? "More signs will appear here as the archive grows."
-              : "No signs match this search."}
+            No signs match this search.
           </div>
         )}
       </section>

@@ -21,11 +21,6 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#039;");
 }
 
-function stars(rating: string) {
-  const count = Number(rating);
-  return Number.isFinite(count) && count > 0 ? "🌟".repeat(Math.min(count, 3)) : "";
-}
-
 export function SignMap({ signs }: { signs: SignRecord[] }) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Leaflet.Map | null>(null);
@@ -85,12 +80,11 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
       const address = escapeHtml(sign.formatted_address || "Address Pending");
       const restaurantHref = sign.restaurant_website_url || `/sign/${encodeURIComponent(sign.id)}`;
       const addressHref = sign.google_maps_url || `/sign/${encodeURIComponent(sign.id)}`;
-      const rating = stars(sign.usability_rating);
       const icon = leaflet.divIcon({
         className: "",
         html: `
           <div class="grid h-[72px] w-[72px] place-items-center rounded-full border border-black bg-white shadow-sm">
-            <img src="${escapeHtml(imageUrl)}" alt="" class="h-14 w-14 rounded-full object-cover" />
+            <img src="${escapeHtml(imageUrl)}" alt="" class="archive-image h-14 w-14 rounded-full object-cover object-center" />
           </div>
         `,
         iconSize: [72, 72],
@@ -105,7 +99,6 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           <div class="w-56 text-sm leading-tight">
             <a class="block font-semibold underline-offset-2 hover:underline" href="${escapeHtml(restaurantHref)}" target="${sign.restaurant_website_url ? "_blank" : "_self"}">${restaurant}</a>
             <a class="mt-2 block text-xs leading-4 text-black/65 underline-offset-2 hover:underline" href="${escapeHtml(addressHref)}" target="_blank">${address}</a>
-            ${rating ? `<p class="mt-2 text-sm">${rating}</p>` : ""}
             <a class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" href="/sign/${escapeHtml(sign.id)}">View Sign</a>
           </div>
         `,

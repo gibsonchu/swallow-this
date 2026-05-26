@@ -21,8 +21,10 @@ type Prediction = {
 
 export function PlaceAutocomplete({
   onPlaceSelected,
+  resetKey = 0,
 }: {
   apiKey?: string;
+  resetKey?: number;
   onPlaceSelected: (place: PlaceValue) => void;
 }) {
   const [query, setQuery] = useState("");
@@ -30,6 +32,16 @@ export function PlaceAutocomplete({
   const [status, setStatus] = useState("Search For A Restaurant");
   const [open, setOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    abortRef.current?.abort();
+    queueMicrotask(() => {
+      setQuery("");
+      setPredictions([]);
+      setOpen(false);
+      setStatus("Search For A Restaurant");
+    });
+  }, [resetKey]);
 
   useEffect(() => {
     abortRef.current?.abort();

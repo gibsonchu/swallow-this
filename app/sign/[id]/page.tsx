@@ -17,14 +17,8 @@ export default async function SignDetailPage({
   const imageUrl = sign.image_processed_url || sign.image_original_url;
   const label = sign.restaurant_name || "Unknown Restaurant";
   const dateVisited = sign.date_visited || sign.date_collected;
-  const usabilityLabel =
-    sign.usability_rating === "1"
-      ? "🌟 Non-Functional"
-      : sign.usability_rating === "2"
-        ? "🌟🌟 Marginal"
-        : sign.usability_rating === "3"
-          ? "🌟🌟🌟 Usable"
-          : "Unrated";
+  const designerLabel = sign.designer || "Unknown. Please contact me to provide credit.";
+  const designerHref = sign.designer_url || "https://x.com/gibsontchu";
   const tags = sign.tags
     .split(",")
     .map((tag) => tag.trim())
@@ -40,7 +34,7 @@ export default async function SignDetailPage({
       <article className="grid gap-6 px-4 py-6 md:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] md:px-6">
         <div className="border border-black/10 bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl} alt={label} className="max-h-[78vh] w-full object-contain p-4" />
+          <img src={imageUrl} alt={label} className="archive-image max-h-[78vh] w-full object-contain p-4" />
         </div>
 
         <section className="grid content-start gap-5">
@@ -59,23 +53,29 @@ export default async function SignDetailPage({
           <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
             {[
               ["Address", sign.formatted_address],
-              ["Designer", sign.designer],
+              ["Designer", designerLabel],
               ["Borough", sign.borough],
               ["Date Visited", dateVisited],
               ["Submitted By", sign.submitter_name],
-              ["Usability", usabilityLabel],
+              ...(sign.restaurants_using_design
+                ? ([["List Of Restaurants Also Using This Design", sign.restaurants_using_design]] as [string, string][])
+                : []),
             ].map(([label, value]) => (
-              <div key={label} className="grid grid-cols-[140px_1fr] bg-white">
+              <div key={label} className="grid grid-cols-[170px_1fr] bg-white">
                 <dt className="border-r border-black/10 p-3 font-mono text-[11px] uppercase text-black/45">
                   {label}
                 </dt>
-                <dd className="p-3">
+                <dd className="whitespace-pre-line p-3">
                   {label === "Address" && sign.google_maps_url && value ? (
                     <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
                       {value}
                     </a>
                   ) : label === "Designer" && sign.designer_url && value ? (
-                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.designer_url} target="_blank" rel="noreferrer">
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={designerHref} target="_blank" rel="noreferrer">
+                      {value}
+                    </a>
+                  ) : label === "Designer" ? (
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={designerHref} target="_blank" rel="noreferrer">
                       {value}
                     </a>
                   ) : (
@@ -88,7 +88,7 @@ export default async function SignDetailPage({
 
           {sign.notes && (
             <section>
-              <h2 className="mb-2 font-mono text-[11px] uppercase text-black/45">Usability Reasoning</h2>
+              <h2 className="mb-2 font-mono text-[11px] uppercase text-black/45">Notes</h2>
               <p className="max-w-prose text-sm leading-6 text-black/75">{sign.notes}</p>
             </section>
           )}
