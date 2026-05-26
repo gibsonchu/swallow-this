@@ -11,11 +11,14 @@ type SubmissionForm = {
   latitude: string;
   longitude: string;
   google_maps_url: string;
+  restaurant_website_url: string;
   borough: string;
   neighborhood: string;
   notes: string;
+  designer_url: string;
   tags: string;
   date_visited: string;
+  usability_rating: string;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -28,11 +31,14 @@ const initialForm: SubmissionForm = {
   latitude: "",
   longitude: "",
   google_maps_url: "",
+  restaurant_website_url: "",
   borough: "",
   neighborhood: "",
   notes: "",
+  designer_url: "",
   tags: "",
   date_visited: today,
+  usability_rating: "",
 };
 
 export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string }) {
@@ -55,6 +61,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
     latitude: string;
     longitude: string;
     google_maps_url: string;
+    restaurant_website_url: string;
   }) => {
     setForm((current) => ({ ...current, ...place }));
   }, []);
@@ -68,7 +75,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
 
   const submit = async () => {
     if (!file) {
-      setMessage("Please add an image.");
+      setMessage("Please Add An Image.");
       return;
     }
 
@@ -84,14 +91,14 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
     setBusy(false);
 
     if (!response.ok) {
-      setMessage(result.error || "Submission failed.");
+      setMessage(result.error || "Submission Failed.");
       return;
     }
 
     setForm({ ...initialForm, date_visited: today });
     setFile(null);
     setPreviewUrl("");
-    setMessage(result.warning || "Submitted. It will show up after review.");
+    setMessage(result.warning || "Submitted. It Will Show Up After Review.");
   };
 
   return (
@@ -107,7 +114,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
             <img src={previewUrl} alt="Submission preview" className="h-full w-full object-contain p-3" />
           ) : (
             <div className="flex h-full items-center justify-center p-6 text-center text-sm text-black/40">
-              Add the sign photo.
+              Add The Sign Photo.
             </div>
           )}
         </div>
@@ -115,26 +122,19 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
 
       <section className="grid content-start gap-4">
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Restaurant name</span>
+          <span className="font-medium">Restaurant Name</span>
           <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
         </label>
 
         <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Latitude</span>
-            <input className="border border-black/15 bg-white px-3 py-2" inputMode="decimal" value={form.latitude} onChange={(event) => setField("latitude", event.target.value)} />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Longitude</span>
-            <input className="border border-black/15 bg-white px-3 py-2" inputMode="decimal" value={form.longitude} onChange={(event) => setField("longitude", event.target.value)} />
-          </label>
-        </div>
-
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Google Maps URL</span>
           <input className="border border-black/15 bg-white px-3 py-2" value={form.google_maps_url} onChange={(event) => setField("google_maps_url", event.target.value)} />
+        </label>
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Restaurant Website URL</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_website_url} onChange={(event) => setField("restaurant_website_url", event.target.value)} />
         </label>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -154,10 +154,14 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
             </select>
           </label>
           <label className="grid gap-1 text-sm">
-            <span className="font-medium">Date visited</span>
+            <span className="font-medium">Date Visited</span>
             <input className="border border-black/15 bg-white px-3 py-2" type="date" value={form.date_visited} onChange={(event) => setField("date_visited", event.target.value)} />
           </label>
         </div>
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Designer Website URL</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.designer_url} onChange={(event) => setField("designer_url", event.target.value)} />
+        </label>
 
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Neighborhood</span>
@@ -165,7 +169,17 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
         </label>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Notes/description</span>
+          <span className="font-medium">Usability Rating</span>
+          <select className="border border-black/15 bg-white px-3 py-2" value={form.usability_rating} onChange={(event) => setField("usability_rating", event.target.value)}>
+            <option value="">Unrated</option>
+            <option value="1">1 - Non-Functional</option>
+            <option value="2">2 - Marginal</option>
+            <option value="3">3 - Usable</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Usability Reasoning</span>
           <textarea className="min-h-24 border border-black/15 bg-white px-3 py-2" value={form.notes} onChange={(event) => setField("notes", event.target.value)} />
         </label>
 
@@ -180,7 +194,7 @@ export function SubmitSignForm({ googleMapsApiKey }: { googleMapsApiKey?: string
           disabled={!canSubmit}
           onClick={submit}
         >
-          {busy ? "Submitting" : "Submit for review"}
+          {busy ? "Submitting" : "Submit For Review"}
         </button>
 
         {message && <p className="font-mono text-xs uppercase text-black/55">{message}</p>}

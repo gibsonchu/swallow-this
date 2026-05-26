@@ -15,6 +15,7 @@ function searchableText(sign: SignRecord) {
   return [
     sign.restaurant_name,
     sign.designer,
+    sign.usability_rating,
     sign.borough,
     sign.neighborhood,
     sign.notes,
@@ -115,7 +116,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
             <div className="flex max-w-xl flex-col justify-end pb-2">
               <p className="font-mono text-[11px] uppercase text-black/45">Featured sign</p>
               <h2 className="mt-3 text-4xl font-semibold leading-none md:text-6xl">
-                {featured.restaurant_name || "Unknown restaurant"}
+                {featured.restaurant_name || "Unknown Restaurant"}
               </h2>
               <p className="mt-5 text-sm leading-6 text-black/60">
                 {[featured.borough, featured.date_visited || featured.date_collected].filter(Boolean).join(" / ") ||

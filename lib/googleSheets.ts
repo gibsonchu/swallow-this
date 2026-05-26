@@ -109,6 +109,9 @@ function rowToSign(row: string[]): SignRecord {
     published: parseBoolean(record.published),
     status: record.status || (parseBoolean(record.published) ? "approved" : "draft"),
     submitted_at: record.submitted_at || "",
+    restaurant_website_url: record.restaurant_website_url || "",
+    designer_url: record.designer_url || "",
+    usability_rating: record.usability_rating || "",
   };
 }
 
@@ -120,7 +123,7 @@ function signToRow(sign: SignRecord) {
 
 async function getSheetRows() {
   const response = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:V")}`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent("Signs!A:Y")}`,
   );
   if (!response) return [];
 
@@ -172,6 +175,9 @@ export async function createSign(input: SignInput) {
     published: Boolean(input.published),
     status: input.status || (input.published ? "approved" : "draft"),
     submitted_at: input.submitted_at || "",
+    restaurant_website_url: input.restaurant_website_url || "",
+    designer_url: input.designer_url || "",
+    usability_rating: input.usability_rating || "",
   };
 
   if (!hasSheetsEnv()) {
@@ -183,7 +189,7 @@ export async function createSign(input: SignInput) {
 
   const writeResponse = await sheetsFetch(
     `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(
-      `Signs!A${nextRowNumber}:V${nextRowNumber}`,
+      `Signs!A${nextRowNumber}:Y${nextRowNumber}`,
     )}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
@@ -214,10 +220,13 @@ export async function updateSign(id: string, input: Partial<SignInput>) {
     published: Boolean(input.published),
     status: input.status || existing.status || (input.published ? "approved" : "draft"),
     submitted_at: input.submitted_at || existing.submitted_at || "",
+    restaurant_website_url: input.restaurant_website_url || existing.restaurant_website_url || "",
+    designer_url: input.designer_url || existing.designer_url || "",
+    usability_rating: input.usability_rating || existing.usability_rating || "",
   };
 
   const writeResponse = await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:V${rowNumber}`)}?valueInputOption=USER_ENTERED`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:Y${rowNumber}`)}?valueInputOption=USER_ENTERED`,
     {
       method: "PUT",
       body: JSON.stringify({ values: [signToRow(sign)] }),
@@ -235,7 +244,7 @@ export async function deleteSign(id: string) {
 
   const sign = rowToSign(rows[rowNumber - 1]);
   await sheetsFetch(
-    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:V${rowNumber}`)}:clear`,
+    `${process.env.GOOGLE_SHEET_ID}/values/${encodeURIComponent(`Signs!A${rowNumber}:Y${rowNumber}`)}:clear`,
     { method: "POST", body: JSON.stringify({}) },
   );
 

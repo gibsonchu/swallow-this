@@ -3,7 +3,7 @@ import type { SignRecord } from "@/types/sign";
 
 export function SignCard({ sign }: { sign: SignRecord }) {
   const imageUrl = sign.image_processed_url || sign.image_original_url;
-  const label = sign.restaurant_name || "Unknown restaurant";
+  const label = sign.restaurant_name || "Unknown Restaurant";
   const dateVisited = sign.date_visited || sign.date_collected;
 
   return (

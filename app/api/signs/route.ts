@@ -32,9 +32,11 @@ export async function POST(request: Request) {
       latitude: body.latitude || "",
       longitude: body.longitude || "",
       google_maps_url: body.google_maps_url || "",
+      restaurant_website_url: body.restaurant_website_url || "",
       borough: body.borough || "",
       neighborhood: body.neighborhood || "",
       designer: body.designer || "",
+      designer_url: body.designer_url || "",
       notes: body.notes || "",
       tags: body.tags || "",
       date_collected: body.date_collected || body.date_visited || "",
@@ -42,6 +44,7 @@ export async function POST(request: Request) {
       published: Boolean(body.published),
       status: body.status || (body.published ? "approved" : "draft"),
       submitted_at: body.submitted_at || "",
+      usability_rating: body.usability_rating || "",
     });
 
     return NextResponse.json(result);
@@ -73,9 +76,11 @@ export async function PATCH(request: Request) {
       latitude: body.latitude || "",
       longitude: body.longitude || "",
       google_maps_url: body.google_maps_url || "",
+      restaurant_website_url: body.restaurant_website_url || "",
       borough: body.borough || "",
       neighborhood: body.neighborhood || "",
       designer: body.designer || "",
+      designer_url: body.designer_url || "",
       notes: body.notes || "",
       tags: body.tags || "",
       date_collected: body.date_collected || body.date_visited || "",
@@ -83,6 +88,7 @@ export async function PATCH(request: Request) {
       published: Boolean(body.published),
       status: body.status || (body.published ? "approved" : "draft"),
       submitted_at: body.submitted_at || "",
+      usability_rating: body.usability_rating || "",
     });
 
     return NextResponse.json(result);

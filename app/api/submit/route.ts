@@ -34,9 +34,11 @@ export async function POST(request: Request) {
       latitude: text(form, "latitude"),
       longitude: text(form, "longitude"),
       google_maps_url: text(form, "google_maps_url"),
+      restaurant_website_url: text(form, "restaurant_website_url"),
       borough: text(form, "borough"),
       neighborhood: text(form, "neighborhood"),
       designer: text(form, "designer"),
+      designer_url: text(form, "designer_url"),
       notes: text(form, "notes"),
       tags: text(form, "tags"),
       date_collected: text(form, "date_visited"),
@@ -44,6 +46,7 @@ export async function POST(request: Request) {
       published: false,
       status: "pending",
       submitted_at: now,
+      usability_rating: text(form, "usability_rating"),
     });
 
     return NextResponse.json({

@@ -9,9 +9,11 @@ export type SignRecord = {
   latitude: string;
   longitude: string;
   google_maps_url: string;
+  restaurant_website_url: string;
   borough: string;
   neighborhood: string;
   designer: string;
+  designer_url: string;
   notes: string;
   tags: string;
   date_collected: string;
@@ -21,6 +23,7 @@ export type SignRecord = {
   published: boolean;
   status: string;
   submitted_at: string;
+  usability_rating: string;
 };
 
 export type SignInput = Omit<SignRecord, "id" | "created_at" | "updated_at"> & {
@@ -38,6 +41,7 @@ export const SHEET_COLUMNS = [
   "latitude",
   "longitude",
   "google_maps_url",
+  "restaurant_website_url",
   "borough",
   "neighborhood",
   "notes",
@@ -50,4 +54,6 @@ export const SHEET_COLUMNS = [
   "date_visited",
   "status",
   "submitted_at",
+  "designer_url",
+  "usability_rating",
 ] as const;

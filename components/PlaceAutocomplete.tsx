@@ -9,6 +9,7 @@ type PlaceValue = {
   latitude: string;
   longitude: string;
   google_maps_url: string;
+  restaurant_website_url: string;
 };
 
 type Prediction = {
@@ -26,7 +27,7 @@ export function PlaceAutocomplete({
 }) {
   const [query, setQuery] = useState("");
   const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [status, setStatus] = useState("Search for a restaurant");
+  const [status, setStatus] = useState("Search For A Restaurant");
   const [open, setOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -37,7 +38,7 @@ export function PlaceAutocomplete({
     if (input.length < 2) {
       setPredictions([]);
       setOpen(false);
-      setStatus("Search for a restaurant");
+      setStatus("Search For A Restaurant");
       return;
     }
 
@@ -53,16 +54,16 @@ export function PlaceAutocomplete({
           signal: controller.signal,
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Place search failed");
+        if (!response.ok) throw new Error(result.error || "Place Search Failed");
 
         setPredictions(result.predictions || []);
         setOpen(Boolean(result.predictions?.length));
-        setStatus(result.predictions?.length ? "Select a place" : "No places found");
+        setStatus(result.predictions?.length ? "Select A Place" : "No Places Found");
       } catch (error) {
         if (controller.signal.aborted) return;
         setPredictions([]);
         setOpen(false);
-        setStatus(error instanceof Error ? error.message : "Place search failed");
+        setStatus(error instanceof Error ? error.message : "Place Search Failed");
       }
     }, 250);
 
@@ -75,7 +76,7 @@ export function PlaceAutocomplete({
   const selectPrediction = async (prediction: Prediction) => {
     setQuery(prediction.label);
     setOpen(false);
-    setStatus("Loading place");
+    setStatus("Loading Place");
 
     try {
       const response = await fetch("/api/places/details", {
@@ -84,18 +85,18 @@ export function PlaceAutocomplete({
         body: JSON.stringify({ place_id: prediction.place_id }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Place details failed");
+      if (!response.ok) throw new Error(result.error || "Place Details Failed");
 
       onPlaceSelected(result.place);
-      setStatus(result.place.restaurant_name ? `Selected: ${result.place.restaurant_name}` : "Place selected");
+      setStatus(result.place.restaurant_name ? `Selected: ${result.place.restaurant_name}` : "Place Selected");
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Place details failed");
+      setStatus(error instanceof Error ? error.message : "Place Details Failed");
     }
   };
 
   return (
     <label className="relative grid gap-1 text-sm">
-      <span className="font-medium">Place search</span>
+      <span className="font-medium">Place Search</span>
       <input
         className="border border-black/15 bg-white px-3 py-2 outline-none focus:border-black"
         placeholder="Search NYC restaurants"

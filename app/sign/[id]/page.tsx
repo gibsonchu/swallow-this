@@ -15,8 +15,16 @@ export default async function SignDetailPage({
   if (!sign) notFound();
 
   const imageUrl = sign.image_processed_url || sign.image_original_url;
-  const label = sign.restaurant_name || "Unknown restaurant";
+  const label = sign.restaurant_name || "Unknown Restaurant";
   const dateVisited = sign.date_visited || sign.date_collected;
+  const usabilityLabel =
+    sign.usability_rating === "1"
+      ? "1 - Non-Functional"
+      : sign.usability_rating === "2"
+        ? "2 - Marginal"
+        : sign.usability_rating === "3"
+          ? "3 - Usable"
+          : "Unrated";
   const tags = sign.tags
     .split(",")
     .map((tag) => tag.trim())
@@ -26,7 +34,7 @@ export default async function SignDetailPage({
     <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
       <header className="border-b border-black/10 px-4 py-3">
         <Link className="font-mono text-xs uppercase text-black/55 hover:text-black" href="/">
-          Back to archive
+          Back To Archive
         </Link>
       </header>
       <article className="grid gap-6 px-4 py-6 md:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] md:px-6">
@@ -37,36 +45,52 @@ export default async function SignDetailPage({
 
         <section className="grid content-start gap-5">
           <div>
-            <h1 className="text-3xl font-semibold tracking-normal">{label}</h1>
+            <h1 className="text-3xl font-semibold tracking-normal">
+              {sign.restaurant_website_url ? (
+                <a className="hover:underline" href={sign.restaurant_website_url} target="_blank" rel="noreferrer">
+                  {label}
+                </a>
+              ) : (
+                label
+              )}
+            </h1>
           </div>
 
           <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
             {[
+              ["Address", sign.formatted_address],
               ["Designer", sign.designer],
               ["Borough", sign.borough],
-              ["Date visited", dateVisited],
+              ["Date Visited", dateVisited],
+              ["Usability", usabilityLabel],
             ].map(([label, value]) => (
-              <div key={label} className="grid grid-cols-[130px_1fr] bg-white">
+              <div key={label} className="grid grid-cols-[140px_1fr] bg-white">
                 <dt className="border-r border-black/10 p-3 font-mono text-[11px] uppercase text-black/45">
                   {label}
                 </dt>
-                <dd className="p-3">{value || "Unknown"}</dd>
+                <dd className="p-3">
+                  {label === "Address" && sign.google_maps_url && value ? (
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
+                      {value}
+                    </a>
+                  ) : label === "Designer" && sign.designer_url && value ? (
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.designer_url} target="_blank" rel="noreferrer">
+                      {value}
+                    </a>
+                  ) : (
+                    value || "Unknown"
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
 
-          {sign.google_maps_url && (
-            <a
-              className="inline-flex w-fit border border-black px-3 py-2 text-sm hover:bg-black hover:text-white"
-              href={sign.google_maps_url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open in Google Maps
-            </a>
+          {sign.notes && (
+            <section>
+              <h2 className="mb-2 font-mono text-[11px] uppercase text-black/45">Usability Reasoning</h2>
+              <p className="max-w-prose text-sm leading-6 text-black/75">{sign.notes}</p>
+            </section>
           )}
-
-          {sign.notes && <p className="max-w-prose text-sm leading-6 text-black/75">{sign.notes}</p>}
 
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-2">

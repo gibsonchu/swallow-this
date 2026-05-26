@@ -19,15 +19,18 @@ type SignForm = {
   latitude: string;
   longitude: string;
   google_maps_url: string;
+  restaurant_website_url: string;
   borough: string;
   neighborhood: string;
   notes: string;
+  designer_url: string;
   tags: string;
   date_collected: string;
   date_visited: string;
   published: boolean;
   status: string;
   submitted_at: string;
+  usability_rating: string;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -39,15 +42,18 @@ const initialForm: SignForm = {
   latitude: "",
   longitude: "",
   google_maps_url: "",
+  restaurant_website_url: "",
   borough: "",
   neighborhood: "",
   notes: "",
+  designer_url: "",
   tags: "",
   date_collected: today,
   date_visited: today,
   published: false,
   status: "draft",
   submitted_at: "",
+  usability_rating: "",
 };
 
 function formFromSign(sign: SignRecord): SignForm {
@@ -60,15 +66,18 @@ function formFromSign(sign: SignRecord): SignForm {
     latitude: sign.latitude || "",
     longitude: sign.longitude || "",
     google_maps_url: sign.google_maps_url || "",
+    restaurant_website_url: sign.restaurant_website_url || "",
     borough: sign.borough || "",
     neighborhood: sign.neighborhood || "",
     notes: sign.notes || "",
+    designer_url: sign.designer_url || "",
     tags: sign.tags || "",
     date_collected: sign.date_collected || sign.date_visited || today,
     date_visited: sign.date_visited || sign.date_collected || today,
     published: Boolean(sign.published),
     status: sign.status || (sign.published ? "approved" : "draft"),
     submitted_at: sign.submitted_at || "",
+    usability_rating: sign.usability_rating || "",
   };
 }
 
@@ -114,6 +123,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     latitude: string;
     longitude: string;
     google_maps_url: string;
+    restaurant_website_url: string;
   }) => {
     setForm((current) => ({ ...current, ...place }));
   }, []);
@@ -147,7 +157,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     const processedUrl = upload?.processedUrl || upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_processed_url;
 
     if (!originalUrl) {
-      setMessage("Upload an image before saving.");
+      setMessage("Upload An Image Before Saving.");
       return;
     }
 
@@ -167,7 +177,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     setBusy("");
 
     if (!response.ok) {
-      setMessage(result.error || "Save failed");
+      setMessage(result.error || "Save Failed");
       return;
     }
 
@@ -195,7 +205,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     }
 
     resetForm();
-    setMessage("Removed from Google Sheets.");
+    setMessage("Removed From Google Sheets.");
     await loadSigns();
   };
 
@@ -221,11 +231,11 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     setBusy("");
 
     if (!response.ok) {
-      setMessage(result.error || "Approval failed");
+      setMessage(result.error || "Approval Failed");
       return;
     }
 
-    setMessage("Approved and published.");
+    setMessage("Approved And Published.");
     resetForm();
     await loadSigns();
   };
@@ -257,7 +267,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
 
       <section className="grid content-start gap-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">{editing ? "Edit sign" : "New sign"}</h2>
+          <h2 className="text-lg font-semibold">{editing ? "Edit Sign" : "New Sign"}</h2>
           {editing && (
             <button className="border border-black/15 px-3 py-1 text-sm hover:border-black" type="button" onClick={resetForm}>
               New
@@ -266,26 +276,19 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         </div>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Restaurant name</span>
+          <span className="font-medium">Restaurant Name</span>
           <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_name} onChange={(event) => setField("restaurant_name", event.target.value)} />
         </label>
 
         <PlaceAutocomplete apiKey={googleMapsApiKey} onPlaceSelected={handlePlaceSelected} />
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Latitude</span>
-            <input className="border border-black/15 bg-white px-3 py-2" inputMode="decimal" value={form.latitude} onChange={(event) => setField("latitude", event.target.value)} />
-          </label>
-          <label className="grid gap-1 text-sm">
-            <span className="font-medium">Longitude</span>
-            <input className="border border-black/15 bg-white px-3 py-2" inputMode="decimal" value={form.longitude} onChange={(event) => setField("longitude", event.target.value)} />
-          </label>
-        </div>
-
         <label className="grid gap-1 text-sm">
           <span className="font-medium">Google Maps URL</span>
           <input className="border border-black/15 bg-white px-3 py-2" value={form.google_maps_url} onChange={(event) => setField("google_maps_url", event.target.value)} />
+        </label>
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Restaurant Website URL</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.restaurant_website_url} onChange={(event) => setField("restaurant_website_url", event.target.value)} />
         </label>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -305,13 +308,27 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
             </select>
           </label>
           <label className="grid gap-1 text-sm">
-            <span className="font-medium">Date visited</span>
+            <span className="font-medium">Date Visited</span>
             <input className="border border-black/15 bg-white px-3 py-2" type="date" value={form.date_visited} onChange={(event) => setField("date_visited", event.target.value)} />
           </label>
         </div>
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Designer Website URL</span>
+          <input className="border border-black/15 bg-white px-3 py-2" value={form.designer_url} onChange={(event) => setField("designer_url", event.target.value)} />
+        </label>
 
         <label className="grid gap-1 text-sm">
-          <span className="font-medium">Notes/description</span>
+          <span className="font-medium">Usability Rating</span>
+          <select className="border border-black/15 bg-white px-3 py-2" value={form.usability_rating} onChange={(event) => setField("usability_rating", event.target.value)}>
+            <option value="">Unrated</option>
+            <option value="1">1 - Non-Functional</option>
+            <option value="2">2 - Marginal</option>
+            <option value="3">3 - Usable</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1 text-sm">
+          <span className="font-medium">Usability Reasoning</span>
           <textarea className="min-h-24 border border-black/15 bg-white px-3 py-2" value={form.notes} onChange={(event) => setField("notes", event.target.value)} />
         </label>
         <label className="grid gap-1 text-sm">
@@ -324,7 +341,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         </label>
         {form.status === "pending" && (
           <p className="border border-black/10 bg-white p-3 font-mono text-xs uppercase text-black/55">
-            Pending public submission.
+            Pending Public Submission.
           </p>
         )}
 
@@ -335,7 +352,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
             disabled={(!upload?.originalUrl && !editing) || disabled}
             onClick={saveSign}
           >
-            {editing ? "Update sign" : "Save sign"}
+            {editing ? "Update Sign" : "Save Sign"}
           </button>
           {editing && form.status === "pending" && (
             <button className="border border-black bg-white px-4 py-2 text-sm hover:bg-black hover:text-white" type="button" disabled={disabled} onClick={approveCurrentSign}>
@@ -350,7 +367,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
         </div>
 
         {!upload?.originalUrl && !editing && !busy && (
-          <p className="font-mono text-xs uppercase text-black/45">Upload an image before saving.</p>
+          <p className="font-mono text-xs uppercase text-black/45">Upload An Image Before Saving.</p>
         )}
         {(busy || message || upload?.warning) && (
           <p className="font-mono text-xs uppercase text-black/55">{busy || message || upload?.warning}</p>
@@ -387,7 +404,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={sign.image_processed_url || sign.image_original_url} alt="" className="h-14 w-14 object-contain" />
               <span className="min-w-0">
-                <span className="block truncate text-sm font-medium">{sign.restaurant_name || "Untitled sign"}</span>
+                <span className="block truncate text-sm font-medium">{sign.restaurant_name || "Untitled Sign"}</span>
                 <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
                   {[sign.borough || "Unknown", sign.status === "pending" ? "Pending" : sign.published ? "Published" : "Draft"].join(" / ")}
                 </span>
@@ -396,7 +413,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           ))}
           {visibleSigns.length === 0 && (
             <p className="p-4 text-sm text-black/45">
-              {tab === "submissions" ? "No pending submissions." : "No archive records."}
+              {tab === "submissions" ? "No Pending Submissions." : "No Archive Records."}
             </p>
           )}
         </div>

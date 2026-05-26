@@ -9,6 +9,7 @@ type PlaceDetails = {
   formattedAddress?: string;
   location?: { latitude?: number; longitude?: number };
   googleMapsUri?: string;
+  websiteUri?: string;
 };
 
 export async function POST(request: Request) {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
   const response = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, {
     headers: {
       "X-Goog-Api-Key": apiKey,
-      "X-Goog-FieldMask": "id,displayName,formattedAddress,location,googleMapsUri",
+      "X-Goog-FieldMask": "id,displayName,formattedAddress,location,googleMapsUri,websiteUri",
     },
   });
 
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
       latitude: place.location?.latitude === undefined ? "" : String(place.location.latitude),
       longitude: place.location?.longitude === undefined ? "" : String(place.location.longitude),
       google_maps_url: place.googleMapsUri || "",
+      restaurant_website_url: place.websiteUri || "",
     },
   });
 }

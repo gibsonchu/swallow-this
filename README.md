@@ -44,10 +44,10 @@ Create a Google Sheet with a tab named `Signs`.
 Add this exact header row in row 1:
 
 ```text
-id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at
+id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,restaurant_website_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at,designer_url,usability_rating
 ```
 
-The app reads rows on the `Signs` tab and writes new signs to explicit rows. Address and the legacy sign title column are kept as compatibility fields; the admin and public submission flow use restaurant, place search, borough, neighborhood, designer, notes, tags, date visited, published, `status`, and `submitted_at`. Public submissions are saved as `status=pending` and `published=FALSE`.
+The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin and public submission flow focus on restaurant, place search, website links, borough, neighborhood, designer, usability rating, usability reasoning, tags, date visited, published, `status`, and `submitted_at`. Public submissions are saved as `status=pending` and `published=FALSE`.
 
 ## Google service account
 

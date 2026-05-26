@@ -42,9 +42,8 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
             Approximate NYC map
           </div>
           {mappedSigns.map(({ sign, position }, index) => (
-            <Link
+            <div
               key={sign.id}
-              href={`/sign/${sign.id}`}
               className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 hover:z-30"
               style={{ left: `${position.x}%`, top: `${position.y}%` }}
               title={sign.restaurant_name || `Sign ${index + 1}`}
@@ -57,13 +56,26 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
                   className="h-12 w-12 rounded-full object-contain"
                 />
               </span>
-              <span className="pointer-events-none absolute left-1/2 top-20 hidden w-44 -translate-x-1/2 border border-black bg-white p-2 text-left text-[11px] font-normal leading-tight text-black shadow-sm group-hover:block">
-                <span className="block font-medium">{sign.restaurant_name || "Unknown restaurant"}</span>
-                <span className="mt-1 block font-mono uppercase text-black/55">
-                  {sign.borough || "Borough unknown"}
-                </span>
+              <span className="absolute left-1/2 top-20 hidden w-56 -translate-x-1/2 border border-black bg-white p-2 text-left text-[11px] font-normal leading-tight text-black shadow-sm group-hover:block">
+                {sign.restaurant_website_url ? (
+                  <a className="block font-medium hover:underline" href={sign.restaurant_website_url} target="_blank" rel="noreferrer">
+                    {sign.restaurant_name || "Unknown Restaurant"}
+                  </a>
+                ) : (
+                  <Link className="block font-medium hover:underline" href={`/sign/${sign.id}`}>
+                    {sign.restaurant_name || "Unknown Restaurant"}
+                  </Link>
+                )}
+                {sign.formatted_address && (
+                  <a className="mt-1 block text-black/65 hover:underline" href={sign.google_maps_url || "#"} target="_blank" rel="noreferrer">
+                    {sign.formatted_address}
+                  </a>
+                )}
+                <Link className="mt-2 block font-mono uppercase text-black/45 hover:text-black" href={`/sign/${sign.id}`}>
+                  View Sign
+                </Link>
               </span>
-            </Link>
+            </div>
           ))}
           {mappedSigns.length === 0 && (
             <div className="absolute inset-0 grid place-items-center p-6 text-center text-sm text-black/45">
@@ -74,14 +86,14 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
 
         <div className="max-h-[calc(100vh-74px)] overflow-auto bg-[#fdfdf9]">
           <div className="sticky top-0 border-b border-black/10 bg-[#fdfdf9] p-3 font-mono text-[11px] uppercase text-black/50">
-            {mappedSigns.length} mapped signs
+            {mappedSigns.length} Mapped Signs
           </div>
           <div className="divide-y divide-black/10">
             {mappedSigns.map(({ sign }, index) => (
               <Link key={sign.id} href={`/sign/${sign.id}`} className="grid grid-cols-[32px_1fr] gap-3 p-3 text-sm hover:bg-white">
                 <span className="font-mono text-[11px] text-black/45">{String(index + 1).padStart(2, "0")}</span>
                 <span>
-                  <span className="block font-medium">{sign.restaurant_name || "Unknown restaurant"}</span>
+                  <span className="block font-medium">{sign.restaurant_name || "Unknown Restaurant"}</span>
                   <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
                     {[sign.borough, sign.date_visited || sign.date_collected].filter(Boolean).join(" / ") ||
                       "Unlabeled"}
