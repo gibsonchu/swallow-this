@@ -12,7 +12,7 @@ const navItems: Array<{ key: PageKey; label: string; href: string }> = [
 export function SiteHeader({ active }: { active: PageKey }) {
   return (
     <header className="flex flex-wrap items-start justify-between gap-5 border-b border-black/10 px-5 py-6 md:px-10 md:py-8">
-      <Link href="/" className="display-title block whitespace-nowrap text-3xl leading-[0.9] tracking-normal md:text-4xl">
+      <Link href="/" className="display-title block max-w-full text-[2.2rem] leading-[0.9] tracking-normal md:whitespace-nowrap md:text-4xl">
         Choking Hazard Signs
       </Link>
 

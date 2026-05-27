@@ -2,10 +2,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
+    <main className="bg-[#fdfdf9] text-[#151515]">
       <SiteHeader active="contact" />
 
-      <article className="mx-auto mb-28 max-w-3xl px-4 py-10 text-[19px] leading-8 text-black/80 md:mb-40 md:px-7">
+      <article className="mx-auto mb-16 max-w-3xl px-4 py-10 text-[19px] leading-8 text-black/80 md:mb-20 md:px-7">
         <h1 className="mb-8 text-4xl font-semibold tracking-normal text-black md:text-5xl">Contact</h1>
 
         <p>
