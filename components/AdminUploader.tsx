@@ -14,6 +14,7 @@ type ImageEdits = {
   zoom: number;
   x: number;
   y: number;
+  z: number;
   rotation: number;
   brightness: number;
 };
@@ -49,6 +50,7 @@ const initialImageEdits: ImageEdits = {
   zoom: 1,
   x: 0,
   y: 0,
+  z: 0,
   rotation: 0,
   brightness: 100,
 };
@@ -287,8 +289,9 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       context.translate(canvas.width / 2 + imageEdits.x, canvas.height / 2 + imageEdits.y);
       context.rotate((imageEdits.rotation * Math.PI) / 180);
 
+      const zScale = 1 + imageEdits.z / 100;
       const baseScale = Math.max(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
-      const scale = baseScale * imageEdits.zoom;
+      const scale = baseScale * imageEdits.zoom * zScale;
       context.drawImage(
         image,
         -(image.naturalWidth * scale) / 2,
@@ -348,7 +351,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
                 className="archive-image max-h-full max-w-full object-contain object-center"
                 style={{
                   filter: `brightness(${imageEdits.brightness}%)`,
-                  transform: `translate(${imageEdits.x / 8}px, ${imageEdits.y / 8}px) rotate(${imageEdits.rotation}deg) scale(${imageEdits.zoom})`,
+                  transform: `perspective(1000px) translate3d(${imageEdits.x / 8}px, ${imageEdits.y / 8}px, ${imageEdits.z}px) rotate(${imageEdits.rotation}deg) scale(${imageEdits.zoom})`,
                 }}
               />
             </div>
@@ -382,6 +385,10 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
             <label className="grid gap-1">
               <span className="font-mono text-[10px] uppercase text-black/45">Y Axis</span>
               <input type="range" min="-500" max="500" step="1" value={imageEdits.y} onChange={(event) => setImageEdit("y", Number(event.target.value))} />
+            </label>
+            <label className="grid gap-1">
+              <span className="font-mono text-[10px] uppercase text-black/45">Z Axis / Depth</span>
+              <input type="range" min="-40" max="80" step="1" value={imageEdits.z} onChange={(event) => setImageEdit("z", Number(event.target.value))} />
             </label>
             <label className="grid gap-1">
               <span className="font-mono text-[10px] uppercase text-black/45">Rotation</span>

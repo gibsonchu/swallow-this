@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { SignMap } from "@/components/SignMap";
+import { SiteHeader } from "@/components/SiteHeader";
 import { listSigns } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
@@ -9,19 +9,7 @@ export default async function MapPage() {
 
   return (
     <main className="bg-[#fdfdf9] text-[#151515]">
-      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-black/10 px-4 py-5 md:px-7">
-        <div>
-          <p className="font-mono text-[11px] uppercase text-black/45">Map</p>
-          <Link href="/" className="display-title mt-1 block max-w-3xl whitespace-nowrap text-3xl leading-[0.9] md:text-4xl">
-            Choking Hazard Signs
-          </Link>
-        </div>
-        <nav className="flex gap-4 text-sm font-medium">
-          <Link className="text-black/45 hover:text-black" href="/">Library</Link>
-          <Link className="text-black/45 hover:text-black" href="/about">About</Link>
-          <Link className="text-black/45 hover:text-black" href="/contact">Contact</Link>
-        </nav>
-      </header>
+      <SiteHeader active="map" />
       <SignMap signs={signs} />
     </main>
   );

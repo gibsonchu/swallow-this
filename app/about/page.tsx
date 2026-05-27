@@ -1,35 +1,13 @@
 import Link from "next/link";
+import { AboutPosterFigure } from "@/components/AboutPosterFigure";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[#fdfdf9] px-4 py-5 text-[#151515] md:px-7">
-      <header className="mb-10 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
-        <div>
-          <p className="font-mono text-[11px] uppercase text-black/45">About</p>
-          <Link href="/" className="display-title mt-1 block max-w-3xl whitespace-nowrap text-3xl leading-[0.9] md:text-4xl">
-            Choking Hazard Signs
-          </Link>
-        </div>
-        <nav className="flex gap-4 text-sm font-medium">
-          <Link className="text-black/45 hover:text-black" href="/">Library</Link>
-          <Link className="text-black/45 hover:text-black" href="/map">Map</Link>
-          <Link className="text-black/45 hover:text-black" href="/contact">Contact</Link>
-        </nav>
-      </header>
+    <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
+      <SiteHeader active="about" />
 
-      <figure className="mx-auto mb-12 max-w-3xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/about/current-city-poster.png"
-          alt="Current city-issued choking first aid poster"
-          className="mx-auto max-h-[760px] w-full object-contain"
-        />
-        <figcaption className="mt-3 font-mono text-[11px] uppercase leading-5 text-black/45">
-          The current city-issued choking first aid poster, redesigned in 2010 by graphics editors at The New York Times for the NYC Department of Health.
-        </figcaption>
-      </figure>
-
-      <article className="mx-auto mb-24 max-w-3xl text-[19px] leading-8 text-black/80 md:mb-36">
+      <article className="mx-auto mb-24 max-w-3xl px-4 py-10 text-[19px] leading-8 text-black/80 md:mb-36 md:px-7">
         <p>
           In 1978, New York City passed a law requiring restaurants to publicly display instructions for helping someone who is choking. Today, the regulation lives on in New York City Administrative Code § 17-172:
         </p>
@@ -46,8 +24,10 @@ export default function AboutPage() {
         </blockquote>
 
         <p className="mt-6">
-          The Department of Health provides an official version of the poster for free. Most restaurants use this, but as it turns out, many don’t.
+          The Department of Health provides an official version of the poster for free. Most restaurants use this, but as it turns out, many also don’t.
         </p>
+
+        <AboutPosterFigure />
 
         <p className="mt-6">
           For the past five years, I’ve been photographing the custom choking hazard signs scattered across restaurants, bars, cafes, and takeout spots throughout New York City. What started as noticing the occasional quirky poster slowly became an ongoing archive of a very specific kind of urban creativity: the ways businesses reinterpret one of the city’s most mundane legal requirements.

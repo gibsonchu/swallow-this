@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { SignGrid } from "@/components/SignGrid";
 import { SignModal } from "@/components/SignModal";
 import { OptimizedSignImage } from "@/components/OptimizedSignImage";
+import { SiteHeader } from "@/components/SiteHeader";
 import type { SignRecord } from "@/types/sign";
 
 type ViewMode = "icons" | "gallery";
@@ -69,22 +69,11 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   }, [filteredSigns.length, modalIndex, viewMode]);
 
   return (
-    <div className="min-h-[calc(100vh-96px)] bg-[#fdfdf9] text-[#151515]">
-      <header className="flex flex-wrap items-start justify-between gap-5 px-5 py-6 md:px-10 md:py-8">
-        <Link href="/" className="display-title block max-w-[18rem] text-[2.25rem] leading-[0.9] tracking-normal md:max-w-[22rem] md:text-[3rem]">
-          Choking Hazard Signs
-        </Link>
+    <div className="bg-[#fdfdf9] text-[#151515]">
+      <SiteHeader active="library" />
 
-        <nav className="flex flex-wrap gap-4 text-sm font-medium">
-          <span className="text-black">Library</span>
-          <Link className="text-black/45 hover:text-black" href="/map">Map</Link>
-          <Link className="text-black/45 hover:text-black" href="/about">About</Link>
-          <Link className="text-black/45 hover:text-black" href="/contact">Contact</Link>
-        </nav>
-      </header>
-
-      <section className="px-5 py-8 md:px-10 md:py-10">
-        <div className="mb-8 flex flex-wrap justify-end gap-3 font-mono text-[11px] uppercase text-black/45">
+      <section className={`px-5 md:px-10 ${viewMode === "gallery" ? "py-5 md:py-4" : "py-8 md:py-10"}`}>
+        <div className={`flex flex-wrap justify-end gap-3 font-mono text-[11px] uppercase text-black/45 ${viewMode === "gallery" ? "mb-4" : "mb-8"}`}>
           <label className="flex items-center gap-2">
             <span>View</span>
             <select
@@ -115,8 +104,8 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
         {filteredSigns.length > 0 && viewMode === "icons" ? (
           <SignGrid signs={filteredSigns} onSelect={openModal} />
         ) : filteredSigns.length > 0 && selectedGallerySign ? (
-          <div className="grid min-h-[calc(100vh-210px)] place-items-center md:min-h-[calc(100vh-190px)]">
-            <div className="grid justify-items-center gap-5">
+          <div className="grid place-items-center">
+            <div className="grid justify-items-center gap-4">
               <button
                 type="button"
                 onClick={() => openModal(safeGalleryIndex)}
@@ -138,7 +127,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
                   priority
                   quality={75}
                   sizes="(min-width: 768px) 520px, 74vw"
-                  className="h-[56vh] max-h-[56vh] w-[min(520px,74vw)] md:max-h-[58vh]"
+                  className="h-[44vh] max-h-[44vh] w-[min(460px,72vw)] md:h-[46vh] md:max-h-[46vh]"
                   imageClassName="archive-image object-contain object-center transition group-hover:scale-[1.01]"
                 />
                 <span className="text-center">
