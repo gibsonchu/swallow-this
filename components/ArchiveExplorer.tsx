@@ -9,7 +9,6 @@ import type { SignRecord } from "@/types/sign";
 
 type ViewMode = "icons" | "gallery";
 type SortMode = "featured" | "az" | "recent";
-const submitUrl = "https://x.com/gibsontchu";
 
 function sortValue(sign: SignRecord) {
   const value = Number(sign.sort_order);
@@ -71,66 +70,48 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
   return (
     <div className="min-h-[calc(100vh-96px)] bg-[#fdfdf9] text-[#151515]">
-      <header className="grid gap-6 px-5 py-6 md:grid-cols-[minmax(260px,0.7fr)_minmax(0,1fr)] md:items-start md:px-10 md:py-8">
+      <header className="flex flex-wrap items-start justify-between gap-5 px-5 py-6 md:px-10 md:py-8">
         <Link href="/" className="display-title block max-w-[18rem] text-[2.25rem] leading-[0.9] tracking-normal md:max-w-[22rem] md:text-[3rem]">
           Choking Hazard Signs
         </Link>
 
-        <nav className="grid gap-5 md:ml-auto md:grid-cols-[auto_auto_auto] md:items-start md:gap-8 lg:gap-12">
-          <div>
-            <p className="mb-2 font-mono text-[11px] uppercase text-black/40">View By</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              {(["icons", "gallery"] as ViewMode[]).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`w-fit text-left text-base font-semibold capitalize leading-tight md:text-lg ${viewMode === item ? "text-black" : "text-black/45 hover:text-black"}`}
-                  onClick={() => setViewMode(item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Sort</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              {[
-                ["featured", "Featured"],
-                ["az", "A-Z"],
-                ["recent", "Recent"],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`w-fit text-left text-base font-semibold leading-tight md:text-lg ${sortMode === value ? "text-black" : "text-black/45 hover:text-black"}`}
-                  onClick={() => {
-                    setSortMode(value as SortMode);
-                    setGalleryIndex(0);
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Pages</p>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <span className="text-base font-semibold text-black md:text-lg">Library</span>
-              <Link className="text-base font-semibold text-black/45 hover:text-black md:text-lg" href="/map">Map</Link>
-              <Link className="text-base font-semibold text-black/45 hover:text-black md:text-lg" href="/about">About</Link>
-              <Link className="w-fit border border-black bg-black px-4 py-2 text-base font-semibold leading-tight text-white hover:bg-white hover:text-black md:text-lg" href={submitUrl} target="_blank" rel="noreferrer">
-                Submit A Sign
-              </Link>
-            </div>
-          </div>
+        <nav className="flex flex-wrap gap-4 text-sm font-medium">
+          <span className="text-black">Library</span>
+          <Link className="text-black/45 hover:text-black" href="/map">Map</Link>
+          <Link className="text-black/45 hover:text-black" href="/about">About</Link>
+          <Link className="text-black/45 hover:text-black" href="/contact">Contact</Link>
         </nav>
       </header>
 
       <section className="px-5 py-8 md:px-10 md:py-10">
+        <div className="mb-8 flex flex-wrap justify-end gap-3 font-mono text-[11px] uppercase text-black/45">
+          <label className="flex items-center gap-2">
+            <span>View</span>
+            <select
+              className="min-w-28 border border-black/15 bg-[#fdfdf9] px-3 py-2 font-sans text-sm normal-case text-black outline-none focus:border-black"
+              value={viewMode}
+              onChange={(event) => setViewMode(event.target.value as ViewMode)}
+            >
+              <option value="icons">Icons</option>
+              <option value="gallery">Gallery</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-2">
+            <span>Sort</span>
+            <select
+              className="min-w-32 border border-black/15 bg-[#fdfdf9] px-3 py-2 font-sans text-sm normal-case text-black outline-none focus:border-black"
+              value={sortMode}
+              onChange={(event) => {
+                setSortMode(event.target.value as SortMode);
+                setGalleryIndex(0);
+              }}
+            >
+              <option value="featured">Featured</option>
+              <option value="az">A-Z</option>
+              <option value="recent">Recent</option>
+            </select>
+          </label>
+        </div>
         {filteredSigns.length > 0 && viewMode === "icons" ? (
           <SignGrid signs={filteredSigns} onSelect={openModal} />
         ) : filteredSigns.length > 0 && selectedGallerySign ? (

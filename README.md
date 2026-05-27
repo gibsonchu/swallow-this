@@ -47,7 +47,7 @@ Add this exact header row in row 1:
 id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,restaurant_website_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at,designer_url,restaurants_using_design,submitter_name,featured,sort_order
 ```
 
-The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin flow focuses on restaurant, place search, website links, borough, neighborhood, designer, restaurants using the same design, notes, tags, date visited, submitter name, custom `sort_order`, published, `status`, and `submitted_at`. Public submissions are closed; `/submit` redirects to @gibsontchu on X.
+The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin flow focuses on restaurant, place search, website links, borough, neighborhood, designer, restaurants using the same design, notes, tags, date visited, submitter name, custom `sort_order`, published, `status`, and `submitted_at`. Public submissions are closed; `/contact` points visitors to @gibsontchu on X, and `/submit` redirects to `/contact`.
 
 ## Google service account
 
@@ -76,7 +76,8 @@ The app reads rows on the `Signs` tab and writes new signs to explicit rows. Lat
 - `/sign/[id]`: Public sign detail page.
 - `/map`: Public map view for published signs with latitude/longitude.
 - `/about`: Article-style project description.
-- `/submit`: Redirects to @gibsontchu on X for submission requests.
+- `/contact`: Contact page for sign tips and designer credits.
+- `/submit`: Redirects to `/contact`.
 - `/admin`: Password-gated admin upload and metadata dashboard.
 - `/api/signs`: `GET` published signs, authenticated `GET ?all=1` all signs, authenticated `POST` create sign, authenticated `PATCH` update sign, authenticated `DELETE` clear sign row.
 - `/api/submit`: Public submissions are closed and return `410 Gone`.

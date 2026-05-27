@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function SubmitPage() {
-  redirect("https://x.com/gibsontchu");
+  redirect("/contact");
 }
