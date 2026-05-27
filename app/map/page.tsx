@@ -9,14 +9,14 @@ export default async function MapPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
-      <header className="flex items-center justify-between border-b border-black/10 px-4 py-4 md:px-7">
+      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-black/10 px-4 py-5 md:px-7">
         <div>
-          <h1 className="text-2xl font-semibold leading-none">Map</h1>
-          <p className="mt-1 font-mono text-[11px] uppercase text-black/45">
-            Choking Hazard Signs / {signs.length} published
-          </p>
+          <p className="font-mono text-[11px] uppercase text-black/45">Map</p>
+          <Link href="/" className="display-title mt-1 block max-w-3xl text-4xl leading-[0.9] md:text-6xl">
+            Choking Hazard Signs
+          </Link>
         </div>
-        <nav className="flex gap-4 text-sm font-semibold">
+        <nav className="flex gap-4 text-sm font-medium">
           <Link className="text-black/45 hover:text-black" href="/">Index</Link>
           <Link className="text-black/45 hover:text-black" href="/about">About</Link>
           <Link className="text-black/45 hover:text-black" href="/submit">Submit</Link>

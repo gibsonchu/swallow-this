@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AdminHeaderActions } from "@/components/AdminHeaderActions";
 import { AdminUploader } from "@/components/AdminUploader";
 import { isAdminAuthenticated } from "@/lib/auth";
@@ -35,10 +36,17 @@ export default async function AdminPage() {
     <main className="min-h-screen bg-[#fdfdf9] px-4 py-5 text-[#151515] md:px-7">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
         <div>
-          <h1 className="display-title text-3xl leading-none">Choking Hazard Signs Admin</h1>
+          <Link href="/" className="display-title block text-3xl leading-none">
+            Choking Hazard Signs Admin
+          </Link>
           <p className="mt-2 text-sm text-black/55">Upload, annotate, edit, and publish signs.</p>
         </div>
-        <AdminHeaderActions />
+        <div className="flex items-center gap-2">
+          <Link className="border border-black/15 px-4 py-2 text-sm hover:border-black" href="/">
+            Home
+          </Link>
+          <AdminHeaderActions />
+        </div>
       </header>
       <AdminUploader googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY} />
     </main>

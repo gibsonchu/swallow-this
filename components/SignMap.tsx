@@ -12,6 +12,11 @@ function mappedSign(sign: SignRecord) {
   return { sign, lat, lng };
 }
 
+function hasMappableAddress(sign: SignRecord) {
+  const address = sign.formatted_address.trim().toLowerCase();
+  return Boolean(address) && address !== "unknown" && address !== "unknown.";
+}
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -38,6 +43,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
   const mappedSigns = useMemo(
     () =>
       [...signs]
+        .filter(hasMappableAddress)
         .sort((a, b) => sortValue(a) - sortValue(b) || (a.restaurant_name || "").localeCompare(b.restaurant_name || ""))
         .map(mappedSign)
         .filter(Boolean) as { sign: SignRecord; lat: number; lng: number }[],
@@ -118,7 +124,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
             <img src="${escapeHtml(imageUrl)}" alt="" class="archive-image mb-3 h-28 w-full bg-white object-contain object-center" />
             <span class="block font-semibold">${restaurant}</span>
             ${addressHtml}
-            <button class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" type="button" data-sign-modal-index="${index}">View Sign</button>
+            <button class="mt-3 block font-mono text-[10px] uppercase text-black/45 hover:text-black" type="button" data-sign-modal-index="${index}">More Details</button>
           </div>
         `,
           { autoPan: false, className: "sign-map-popup" },
@@ -138,6 +144,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
 
   useEffect(() => {
     if (!selectedSignId) return;
+    if (window.matchMedia("(max-width: 1023px)").matches) return;
     sidebarItemRefs.current[selectedSignId]?.scrollIntoView({ block: "center", behavior: "smooth" });
   }, [selectedSignId]);
 
@@ -161,6 +168,9 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
     const marker = markerRefs.current[sign.id];
     if (!map || !marker) return;
     setSelectedSignId(sign.id);
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      mapElementRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
     const targetZoom = Math.max(map.getZoom(), 15);
     map.setView(marker.getLatLng(), targetZoom, { animate: true });
     window.setTimeout(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { SignGrid } from "@/components/SignGrid";
 import { SignModal } from "@/components/SignModal";
@@ -24,6 +24,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   const [sortMode, setSortMode] = useState<SortMode>("featured");
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [modalIndex, setModalIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const filteredSigns = useMemo(() => {
     return [...signs].sort((a, b) => {
@@ -67,15 +68,13 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   }, [filteredSigns.length, modalIndex, viewMode]);
 
   return (
-    <div className="min-h-screen bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
-      <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-screen md:border-b-0 md:p-10">
-        <h1 className="display-title max-w-[15rem] text-[2rem] leading-[0.9] tracking-normal md:max-w-[13rem] md:text-[2.55rem]">
+    <div className="min-h-[calc(100vh-96px)] bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
+      <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-[calc(100vh-96px)] md:border-b-0 md:p-10">
+        <Link href="/" className="display-title block max-w-[15rem] text-[2rem] leading-[0.9] tracking-normal md:max-w-[13rem] md:text-[2.55rem]">
           Choking Hazard Signs
-        </h1>
+        </Link>
 
         <nav className="mt-8 grid gap-6 md:mt-11 md:gap-9">
-          <p className="font-mono text-[11px] uppercase text-black/45">{filteredSigns.length} signs</p>
-
           <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">View By</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
@@ -129,18 +128,32 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
         </nav>
       </aside>
 
-      <section className="px-5 py-8 md:px-12 md:py-14">
+      <section className="px-5 py-8 md:px-12 md:py-10">
         {filteredSigns.length > 0 && viewMode === "icons" ? (
           <SignGrid signs={filteredSigns} onSelect={openModal} />
         ) : filteredSigns.length > 0 && selectedGallerySign ? (
-          <div className="grid min-h-[calc(100vh-180px)] place-items-center">
+          <div className="grid min-h-[calc(100vh-210px)] place-items-center md:min-h-[calc(100vh-190px)]">
             <div className="grid justify-items-center gap-5">
-              <button type="button" onClick={() => openModal(safeGalleryIndex)} className="group grid justify-items-center gap-4">
+              <button
+                type="button"
+                onClick={() => openModal(safeGalleryIndex)}
+                onTouchStart={(event) => {
+                  touchStartX.current = event.touches[0]?.clientX ?? null;
+                }}
+                onTouchEnd={(event) => {
+                  if (touchStartX.current === null) return;
+                  const delta = (event.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
+                  touchStartX.current = null;
+                  if (Math.abs(delta) < 40) return;
+                  setGalleryIndex((index) => (delta > 0 ? prevIndex(index) : nextIndex(index)));
+                }}
+                className="group grid touch-pan-y justify-items-center gap-4"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={selectedGallerySign.image_processed_url || selectedGallerySign.image_original_url}
                   alt={selectedGallerySign.restaurant_name || "Choking hazard sign"}
-                  className="archive-image max-h-[62vh] max-w-[min(520px,74vw)] object-contain object-center transition group-hover:scale-[1.01]"
+                  className="archive-image max-h-[56vh] max-w-[min(520px,74vw)] object-contain object-center transition group-hover:scale-[1.01] md:max-h-[58vh]"
                 />
                 <span className="text-center">
                   <span className="display-title block text-xl leading-none">{selectedGallerySign.restaurant_name || "Unknown Restaurant"}</span>

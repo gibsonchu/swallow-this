@@ -11,7 +11,7 @@ export function SignGrid({ signs, onSelect }: { signs: SignRecord[]; onSelect: (
   }
 
   return (
-    <div className="archive-grid grid grid-cols-2 gap-x-12 gap-y-16 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="archive-grid grid grid-cols-2 items-start gap-x-12 gap-y-16 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {signs.map((sign, index) => (
         <SignCard key={sign.id} sign={sign} onSelect={() => onSelect(index)} />
       ))}

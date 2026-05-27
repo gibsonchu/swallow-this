@@ -173,6 +173,65 @@ async function clearFeaturedExcept(id: string) {
   });
 }
 
+function numericSortOrder(value: string) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : null;
+}
+
+async function normalizeSortOrders(movedId?: string, requestedOrder?: string) {
+  const rows = await getSheetRows();
+  const hasHeader = rows[0]?.[0] === "id";
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+  const startRow = hasHeader ? 2 : 1;
+  const entries = dataRows
+    .map((row, index) => ({
+      rowNumber: startRow + index,
+      rowIndex: index,
+      sign: rowToSign(row),
+    }))
+    .filter(({ sign }) => sign.id);
+
+  if (entries.length === 0) return;
+
+  const ordered = [...entries].sort((a, b) => {
+    const aOrder = numericSortOrder(a.sign.sort_order) ?? Number.MAX_SAFE_INTEGER;
+    const bOrder = numericSortOrder(b.sign.sort_order) ?? Number.MAX_SAFE_INTEGER;
+    return aOrder - bOrder || a.rowIndex - b.rowIndex;
+  });
+
+  if (movedId) {
+    const movingIndex = ordered.findIndex(({ sign }) => sign.id === movedId);
+    if (movingIndex !== -1) {
+      const [moving] = ordered.splice(movingIndex, 1);
+      const targetOrder = numericSortOrder(requestedOrder || moving.sign.sort_order) ?? ordered.length + 1;
+      const targetIndex = Math.min(Math.max(targetOrder - 1, 0), ordered.length);
+      ordered.splice(targetIndex, 0, moving);
+    }
+  }
+
+  const updates = ordered
+    .map(({ rowNumber, sign }, index) => ({
+      rowNumber,
+      nextOrder: String(index + 1),
+      currentOrder: sign.sort_order,
+    }))
+    .filter(({ nextOrder, currentOrder }) => nextOrder !== currentOrder)
+    .map(({ rowNumber, nextOrder }) => ({
+      range: `Signs!AB${rowNumber}`,
+      values: [[nextOrder]],
+    }));
+
+  if (updates.length === 0) return;
+
+  await sheetsFetch(`${process.env.GOOGLE_SHEET_ID}/values:batchUpdate`, {
+    method: "POST",
+    body: JSON.stringify({
+      valueInputOption: "USER_ENTERED",
+      data: updates,
+    }),
+  });
+}
+
 export async function listSigns(options: { publishedOnly?: boolean } = {}) {
   const fallback = options.publishedOnly ? mockSigns.filter((sign) => sign.published) : mockSigns;
 
@@ -234,6 +293,7 @@ export async function createSign(input: SignInput) {
   );
   const writeData = writeResponse ? ((await writeResponse.json()) as { updatedRange?: string }) : {};
   if (sign.featured) await clearFeaturedExcept(sign.id);
+  await normalizeSortOrders(sign.id, sign.sort_order);
 
   return { sign, stored: true, updatedRange: writeData.updatedRange };
 }
@@ -272,6 +332,7 @@ export async function updateSign(id: string, input: Partial<SignInput>) {
   );
   const writeData = writeResponse ? ((await writeResponse.json()) as { updatedRange?: string }) : {};
   if (sign.featured) await clearFeaturedExcept(sign.id);
+  await normalizeSortOrders(sign.id, sign.sort_order);
 
   return { sign, stored: true, updatedRange: writeData.updatedRange };
 }

@@ -29,6 +29,7 @@ export function SignModal({
   const hasDesigner = Boolean(sign.designer);
   const metadata: [string, string][] = [
     ["Address", sign.formatted_address],
+    ["Restaurant Website", sign.restaurant_website_url],
     ["Designer", sign.designer || "Unknown"],
     ["Borough", sign.borough],
     ["Date Visited", dateFor(sign)],
@@ -94,6 +95,10 @@ export function SignModal({
                 <dd className="whitespace-pre-line p-2">
                   {label === "Address" && sign.google_maps_url && value ? (
                     <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
+                      {value}
+                    </a>
+                  ) : label === "Restaurant Website" && value ? (
+                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={value} target="_blank" rel="noreferrer">
                       {value}
                     </a>
                   ) : label === "Designer" && hasDesigner && sign.designer_url ? (

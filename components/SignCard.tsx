@@ -9,7 +9,7 @@ export function SignCard({ sign, onSelect }: { sign: SignRecord; onSelect: () =>
     <button
       type="button"
       onClick={onSelect}
-      className="archive-card group block text-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-black"
+      className="archive-card group block self-start text-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-black"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
