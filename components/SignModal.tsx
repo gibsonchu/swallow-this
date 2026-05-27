@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { OptimizedSignImage } from "@/components/OptimizedSignImage";
 import type { SignRecord } from "@/types/sign";
 
 function imageFor(sign: SignRecord) {
@@ -67,8 +68,15 @@ export function SignModal({
           Close
         </button>
         <div className="grid min-h-[260px] place-items-center bg-white sm:min-h-[340px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageFor(sign)} alt={sign.restaurant_name || "Choking hazard sign"} className="archive-image max-h-[72vh] w-full object-contain object-center p-3" />
+          <OptimizedSignImage
+            src={imageFor(sign)}
+            alt={sign.restaurant_name || "Choking hazard sign"}
+            priority
+            quality={75}
+            sizes="(min-width: 768px) 620px, 90vw"
+            className="h-[72vh] max-h-[72vh] w-full"
+            imageClassName="archive-image object-contain object-center p-3"
+          />
         </div>
         <div className="flex items-center justify-between gap-3 font-mono text-[11px] uppercase text-black/45 md:hidden">
           <button type="button" className="px-2 py-2 hover:text-black" onClick={onPrev}>

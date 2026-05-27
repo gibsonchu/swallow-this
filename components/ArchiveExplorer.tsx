@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { SignGrid } from "@/components/SignGrid";
 import { SignModal } from "@/components/SignModal";
+import { OptimizedSignImage } from "@/components/OptimizedSignImage";
 import type { SignRecord } from "@/types/sign";
 
 type ViewMode = "icons" | "gallery";
@@ -149,11 +150,14 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
                 }}
                 className="group grid touch-pan-y justify-items-center gap-4"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <OptimizedSignImage
                   src={selectedGallerySign.image_processed_url || selectedGallerySign.image_original_url}
                   alt={selectedGallerySign.restaurant_name || "Choking hazard sign"}
-                  className="archive-image max-h-[56vh] max-w-[min(520px,74vw)] object-contain object-center transition group-hover:scale-[1.01] md:max-h-[58vh]"
+                  priority
+                  quality={75}
+                  sizes="(min-width: 768px) 520px, 74vw"
+                  className="h-[56vh] max-h-[56vh] w-[min(520px,74vw)] md:max-h-[58vh]"
+                  imageClassName="archive-image object-contain object-center transition group-hover:scale-[1.01]"
                 />
                 <span className="text-center">
                   <span className="display-title block text-xl leading-none">{selectedGallerySign.restaurant_name || "Unknown Restaurant"}</span>

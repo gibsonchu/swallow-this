@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { OptimizedSignImage } from "@/components/OptimizedSignImage";
 import { getSignById } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
@@ -32,8 +33,15 @@ export default async function SignDetailPage({
       </header>
       <article className="grid gap-6 px-4 py-6 md:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] md:px-6">
         <div className="border border-black/10 bg-white">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl} alt={label} className="archive-image max-h-[78vh] w-full object-contain p-4" />
+          <OptimizedSignImage
+            src={imageUrl}
+            alt={label}
+            priority
+            quality={75}
+            sizes="(min-width: 768px) 58vw, 100vw"
+            className="h-[78vh] max-h-[78vh] w-full"
+            imageClassName="archive-image object-contain p-4"
+          />
         </div>
 
         <section className="grid content-start gap-5">
