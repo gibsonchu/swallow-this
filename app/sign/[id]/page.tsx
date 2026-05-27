@@ -28,7 +28,7 @@ export default async function SignDetailPage({
     <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
       <header className="border-b border-black/10 px-4 py-3">
         <Link className="font-mono text-xs uppercase text-black/55 hover:text-black" href="/">
-          Back To Index
+          Back To Library
         </Link>
       </header>
       <article className="grid gap-6 px-4 py-6 md:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] md:px-6">

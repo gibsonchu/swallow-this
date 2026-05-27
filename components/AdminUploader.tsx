@@ -10,6 +10,14 @@ type UploadState = {
   warning?: string;
 };
 
+type ImageEdits = {
+  zoom: number;
+  x: number;
+  y: number;
+  rotation: number;
+  brightness: number;
+};
+
 type SignForm = {
   id?: string;
   restaurant_name: string;
@@ -37,6 +45,14 @@ type SignForm = {
 };
 
 const today = new Date().toISOString().slice(0, 10);
+const initialImageEdits: ImageEdits = {
+  zoom: 1,
+  x: 0,
+  y: 0,
+  rotation: 0,
+  brightness: 100,
+};
+
 const initialForm: SignForm = {
   restaurant_name: "",
   designer: "",
@@ -97,10 +113,20 @@ function featuredSort(a: SignRecord, b: SignRecord) {
   return (a.restaurant_name || "").localeCompare(b.restaurant_name || "");
 }
 
+function loadEditableImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Could not load the image for editing."));
+    image.src = src;
+  });
+}
+
 export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string }) {
   const [form, setForm] = useState<SignForm>(initialForm);
-  const [tab, setTab] = useState<"archive" | "submissions">("archive");
   const [upload, setUpload] = useState<UploadState | null>(null);
+  const [imageEdits, setImageEdits] = useState<ImageEdits>(initialImageEdits);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
   const [signs, setSigns] = useState<SignRecord[]>([]);
@@ -109,9 +135,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   const imageToShow = upload?.processedUrl || upload?.originalUrl;
   const editing = Boolean(form.id);
   const disabled = useMemo(() => Boolean(busy), [busy]);
-  const pendingSigns = useMemo(() => signs.filter((sign) => sign.status === "pending"), [signs]);
-  const archiveSigns = useMemo(() => signs.filter((sign) => sign.status !== "pending").sort(featuredSort), [signs]);
-  const visibleSigns = tab === "submissions" ? pendingSigns : archiveSigns;
+  const librarySigns = useMemo(() => [...signs].sort(featuredSort), [signs]);
 
   const loadSigns = useCallback(async () => {
     const response = await fetch("/api/signs?all=1");
@@ -123,9 +147,14 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     setForm((current) => ({ ...current, [field]: value }));
   };
 
+  const setImageEdit = (field: keyof ImageEdits, value: number) => {
+    setImageEdits((current) => ({ ...current, [field]: value }));
+  };
+
   const resetForm = useCallback(() => {
     setForm({ ...initialForm, date_collected: today, date_visited: today });
     setUpload(null);
+    setImageEdits(initialImageEdits);
     setMessage("");
     setPlaceResetKey((key) => key + 1);
   }, []);
@@ -163,6 +192,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     setBusy("");
     if (!response.ok) throw new Error(result.error || "Upload failed");
     setUpload({ originalUrl: result.url, processedUrl: "", warning: result.warning });
+    setImageEdits(initialImageEdits);
     return result.url as string;
   };
 
@@ -213,6 +243,7 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
   const editSign = (sign: SignRecord) => {
     setForm(formFromSign(sign));
     setUpload({ originalUrl: sign.image_original_url, processedUrl: sign.image_processed_url });
+    setImageEdits(initialImageEdits);
     setMessage("");
   };
 
@@ -233,35 +264,65 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
     await loadSigns();
   };
 
-  const approveCurrentSign = async () => {
-    if (!form.id) return;
-    const originalUrl = upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_original_url;
-    const processedUrl = upload?.processedUrl || upload?.originalUrl || signs.find((sign) => sign.id === form.id)?.image_processed_url;
-
-    setBusy("Approving");
-    const response = await fetch("/api/signs", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        date_collected: form.date_visited,
-        image_original_url: originalUrl,
-        image_processed_url: processedUrl || originalUrl,
-        published: true,
-        status: "approved",
-      }),
-    });
-    const result = await response.json();
-    setBusy("");
-
-    if (!response.ok) {
-      setMessage(result.error || "Approval Failed");
+  const applyImageEdits = async () => {
+    if (!imageToShow) {
+      setMessage("Upload An Image Before Editing.");
       return;
     }
 
-    setMessage("Approved And Published.");
-    resetForm();
-    await loadSigns();
+    setBusy("Applying Edits");
+    setMessage("");
+
+    try {
+      const image = await loadEditableImage(imageToShow);
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 1500;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Could not edit the image in this browser.");
+
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.filter = `brightness(${imageEdits.brightness}%)`;
+      context.translate(canvas.width / 2 + imageEdits.x, canvas.height / 2 + imageEdits.y);
+      context.rotate((imageEdits.rotation * Math.PI) / 180);
+
+      const baseScale = Math.max(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+      const scale = baseScale * imageEdits.zoom;
+      context.drawImage(
+        image,
+        -(image.naturalWidth * scale) / 2,
+        -(image.naturalHeight * scale) / 2,
+        image.naturalWidth * scale,
+        image.naturalHeight * scale,
+      );
+
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((nextBlob) => {
+          if (nextBlob) resolve(nextBlob);
+          else reject(new Error("Could not export the edited image."));
+        }, "image/webp", 0.9);
+      });
+
+      const data = new FormData();
+      data.append("file", new File([blob], `edited-sign-${Date.now()}.webp`, { type: "image/webp" }));
+
+      const response = await fetch("/api/upload", { method: "POST", body: data });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Edited image upload failed");
+
+      setUpload((current) => ({
+        originalUrl: current?.originalUrl || result.url,
+        processedUrl: result.url,
+        warning: result.warning,
+      }));
+      setImageEdits(initialImageEdits);
+      setMessage("Edits Applied.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Image editing failed.");
+    } finally {
+      setBusy("");
+    }
   };
 
   return (
@@ -277,16 +338,69 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           />
         </label>
 
-        <div className="aspect-[4/5] border border-black/10 bg-white">
+        <div className="aspect-[4/5] overflow-hidden border border-black/10 bg-white">
           {imageToShow ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageToShow} alt="Upload preview" className="archive-image h-full w-full object-contain object-center p-3" />
+            <div className="grid h-full w-full place-items-center overflow-hidden p-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageToShow}
+                alt="Upload preview"
+                className="archive-image max-h-full max-w-full object-contain object-center"
+                style={{
+                  filter: `brightness(${imageEdits.brightness}%)`,
+                  transform: `translate(${imageEdits.x / 8}px, ${imageEdits.y / 8}px) rotate(${imageEdits.rotation}deg) scale(${imageEdits.zoom})`,
+                }}
+              />
+            </div>
           ) : (
             <div className="flex h-full items-center justify-center p-6 text-center text-sm text-black/40">
               Image preview
             </div>
           )}
         </div>
+
+        {imageToShow && (
+          <div className="grid gap-3 border border-black/10 bg-white p-3 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-medium">Quick Image Edit</span>
+              <button
+                className="font-mono text-[11px] uppercase text-black/45 hover:text-black"
+                type="button"
+                onClick={() => setImageEdits(initialImageEdits)}
+              >
+                Reset
+              </button>
+            </div>
+            <label className="grid gap-1">
+              <span className="font-mono text-[10px] uppercase text-black/45">Crop / Zoom</span>
+              <input type="range" min="1" max="2.5" step="0.01" value={imageEdits.zoom} onChange={(event) => setImageEdit("zoom", Number(event.target.value))} />
+            </label>
+            <label className="grid gap-1">
+              <span className="font-mono text-[10px] uppercase text-black/45">X Axis</span>
+              <input type="range" min="-500" max="500" step="1" value={imageEdits.x} onChange={(event) => setImageEdit("x", Number(event.target.value))} />
+            </label>
+            <label className="grid gap-1">
+              <span className="font-mono text-[10px] uppercase text-black/45">Y Axis</span>
+              <input type="range" min="-500" max="500" step="1" value={imageEdits.y} onChange={(event) => setImageEdit("y", Number(event.target.value))} />
+            </label>
+            <label className="grid gap-1">
+              <span className="font-mono text-[10px] uppercase text-black/45">Rotation</span>
+              <input type="range" min="-20" max="20" step="0.25" value={imageEdits.rotation} onChange={(event) => setImageEdit("rotation", Number(event.target.value))} />
+            </label>
+            <label className="grid gap-1">
+              <span className="font-mono text-[10px] uppercase text-black/45">Brightness</span>
+              <input type="range" min="60" max="150" step="1" value={imageEdits.brightness} onChange={(event) => setImageEdit("brightness", Number(event.target.value))} />
+            </label>
+            <button
+              className="border border-black bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-40"
+              type="button"
+              disabled={disabled}
+              onClick={applyImageEdits}
+            >
+              Apply Edits To Image
+            </button>
+          </div>
+        )}
       </section>
 
       <section className="grid content-start gap-4">
@@ -372,12 +486,6 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           <input type="checkbox" checked={form.published} onChange={(event) => setField("published", event.target.checked)} />
           Published
         </label>
-        {form.status === "pending" && (
-          <p className="border border-black/10 bg-white p-3 font-mono text-xs uppercase text-black/55">
-            Pending Public Submission.
-          </p>
-        )}
-
         <div className="flex gap-2">
           <button
             className="flex-1 border border-black bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
@@ -387,11 +495,6 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
           >
             {editing ? "Update Sign" : "Save Sign"}
           </button>
-          {editing && form.status === "pending" && (
-            <button className="border border-black bg-white px-4 py-2 text-sm hover:bg-black hover:text-white" type="button" disabled={disabled} onClick={approveCurrentSign}>
-              Approve
-            </button>
-          )}
           {editing && (
             <button className="border border-black/15 px-4 py-2 text-sm hover:border-black" type="button" disabled={disabled} onClick={deleteCurrentSign}>
               Delete
@@ -408,26 +511,11 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
       </section>
 
       <section className="max-h-[78vh] overflow-auto border border-black/10 bg-white">
-        <div className="sticky top-0 z-20 border-b border-black/10 bg-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
-          <div className="grid grid-cols-2">
-            <button
-              className={`border-r border-black/10 p-3 text-left font-mono text-[11px] uppercase ${tab === "archive" ? "text-black" : "text-black/40"}`}
-              type="button"
-              onClick={() => setTab("archive")}
-            >
-              Index ({archiveSigns.length})
-            </button>
-            <button
-              className={`p-3 text-left font-mono text-[11px] uppercase ${tab === "submissions" ? "text-black" : "text-black/40"}`}
-              type="button"
-              onClick={() => setTab("submissions")}
-            >
-              Submissions ({pendingSigns.length})
-            </button>
-          </div>
+        <div className="sticky top-0 z-20 border-b border-black/10 bg-white p-3 font-mono text-[11px] uppercase text-black shadow-[0_1px_0_rgba(0,0,0,0.04)]">
+          Library ({librarySigns.length})
         </div>
         <div className="divide-y divide-black/10">
-          {visibleSigns.map((sign) => (
+          {librarySigns.map((sign) => (
             <button
               key={sign.id}
               className="grid w-full grid-cols-[56px_1fr] gap-3 p-3 text-left hover:bg-black/[0.03]"
@@ -444,9 +532,9 @@ export function AdminUploader({ googleMapsApiKey }: { googleMapsApiKey?: string 
               </span>
             </button>
           ))}
-          {visibleSigns.length === 0 && (
+          {librarySigns.length === 0 && (
             <p className="p-4 text-sm text-black/45">
-              {tab === "submissions" ? "No Pending Submissions." : "No Index Records."}
+              No Library Records.
             </p>
           )}
         </div>

@@ -119,7 +119,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
           <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Pages</p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <span className="text-base font-semibold text-black md:text-lg">Index</span>
+              <span className="text-base font-semibold text-black md:text-lg">Library</span>
               <Link className="text-base font-semibold text-black/45 hover:text-black md:text-lg" href="/map">Map</Link>
               <Link className="text-base font-semibold text-black/45 hover:text-black md:text-lg" href="/about">About</Link>
               <Link className="w-fit border border-black bg-black px-4 py-2 text-base font-semibold leading-tight text-white hover:bg-white hover:text-black md:text-lg" href={submitUrl} target="_blank" rel="noreferrer">

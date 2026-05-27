@@ -1,6 +1,6 @@
 # Choking Hazard Signs
 
-A minimal public archive of choking hazard signs collected around New York City. Built with Next.js App Router, TypeScript, Tailwind CSS, Google Sheets, Vercel Blob, and Google Maps Places Autocomplete.
+A minimal public library of choking hazard signs collected around New York City. Built with Next.js App Router, TypeScript, Tailwind CSS, Google Sheets, Vercel Blob, and Google Maps Places Autocomplete.
 
 ## Local setup
 
@@ -16,7 +16,7 @@ npm install
 cp .env.example .env.local
 ```
 
-3. Fill in any available values. The app runs without external keys using mock archive data and data URL image fallbacks.
+3. Fill in any available values. The app runs without external keys using mock library data and data URL image fallbacks.
 
 4. Start the dev server:
 
@@ -47,7 +47,7 @@ Add this exact header row in row 1:
 id,image_original_url,image_processed_url,sign_title,restaurant_name,place_id,formatted_address,latitude,longitude,google_maps_url,restaurant_website_url,borough,neighborhood,notes,tags,date_collected,created_at,updated_at,published,designer,date_visited,status,submitted_at,designer_url,restaurants_using_design,submitter_name,featured,sort_order
 ```
 
-The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin and public submission flow focus on restaurant, place search, website links, borough, neighborhood, designer, restaurants using the same design, notes, tags, date visited, submitter name, custom `sort_order`, published, `status`, and `submitted_at`. Public submissions are saved as `status=pending` and `published=FALSE`.
+The app reads rows on the `Signs` tab and writes new signs to explicit rows. Latitude and longitude are stored as map plumbing; the admin flow focuses on restaurant, place search, website links, borough, neighborhood, designer, restaurants using the same design, notes, tags, date visited, submitter name, custom `sort_order`, published, `status`, and `submitted_at`. Public submissions are closed; `/submit` redirects to @gibsontchu on X.
 
 ## Google service account
 
@@ -72,7 +72,7 @@ The app reads rows on the `Signs` tab and writes new signs to explicit rows. Lat
 - `BLOB_READ_WRITE_TOKEN`: Vercel Blob token for persistent public image storage.
 ## Routes
 
-- `/`: Public archive, published signs only.
+- `/`: Public library, published signs only.
 - `/sign/[id]`: Public sign detail page.
 - `/map`: Public map view for published signs with latitude/longitude.
 - `/about`: Article-style project description.
