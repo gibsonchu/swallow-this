@@ -6,7 +6,7 @@ export default function AboutPage() {
       <header className="mb-10 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
         <div>
           <p className="font-mono text-[11px] uppercase text-black/45">About</p>
-          <Link href="/" className="display-title mt-1 block max-w-3xl text-4xl leading-[0.9] md:text-6xl">
+          <Link href="/" className="display-title mt-1 block max-w-3xl whitespace-nowrap text-3xl leading-[0.9] md:text-4xl">
             Choking Hazard Signs
           </Link>
         </div>

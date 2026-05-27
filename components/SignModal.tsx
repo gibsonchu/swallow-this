@@ -62,7 +62,7 @@ export function SignModal({
   return (
     <div className="fixed inset-0 z-[1000] bg-[#fdfdf9]/70 backdrop-blur-md" role="dialog" aria-modal="true">
       <button className="absolute inset-0 cursor-default" type="button" aria-label="Close" onClick={onClose} />
-      <div className="absolute left-1/2 top-1/2 grid max-h-[92vh] min-h-[min(720px,88vh)] w-[min(980px,94vw)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-auto border border-black/10 bg-[#fdfdf9] p-4 pt-12 shadow-sm sm:p-5 sm:pt-12 md:grid-cols-[minmax(0,1fr)_330px] md:pt-5">
+      <div className="absolute left-1/2 top-1/2 grid max-h-[92vh] min-h-[min(720px,88vh)] w-[min(1040px,94vw)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-auto border border-black/10 bg-[#fdfdf9] p-4 pt-12 shadow-sm sm:p-5 sm:pt-12 md:grid-cols-[minmax(0,1fr)_380px] md:pt-5">
         <button className="absolute right-4 top-4 px-2 py-1 font-mono text-[11px] uppercase text-black/45 hover:text-black" type="button" onClick={onClose}>
           Close
         </button>
@@ -81,24 +81,24 @@ export function SignModal({
             Next →
           </button>
         </div>
-        <section className="flex min-h-[460px] flex-col gap-4 md:min-h-[520px] md:pr-0">
-          <div>
+        <section className="flex min-h-[460px] min-w-0 flex-col gap-5 md:min-h-[520px] md:pr-0 md:pt-7">
+          <div className="min-w-0 pr-20">
             <p className="font-mono text-[11px] uppercase text-black/45">
               {index + 1} / {total}
             </p>
-            <h2 className="display-title mt-2 text-2xl leading-[0.95]">{sign.restaurant_name || "Unknown Restaurant"}</h2>
+            <h2 className="display-title mt-4 break-words text-2xl leading-[0.95]">{sign.restaurant_name || "Unknown Restaurant"}</h2>
           </div>
-          <dl className="grid gap-px overflow-hidden border border-black/10 text-sm">
+          <dl className="grid min-w-0 gap-px overflow-hidden border border-black/10 text-sm">
             {metadata.map(([label, value]) => (
-              <div key={label} className="grid bg-white sm:grid-cols-[118px_1fr]">
+              <div key={label} className="grid min-w-0 bg-white sm:grid-cols-[118px_minmax(0,1fr)]">
                 <dt className="border-b border-black/10 p-2 font-mono text-[10px] uppercase text-black/45 sm:border-b-0 sm:border-r">{label}</dt>
-                <dd className="whitespace-pre-line p-2">
+                <dd className="min-w-0 overflow-hidden whitespace-pre-line break-words p-2">
                   {label === "Address" && sign.google_maps_url && value ? (
-                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
+                    <a className="break-words underline decoration-black/30 underline-offset-2 hover:decoration-black" href={sign.google_maps_url} target="_blank" rel="noreferrer">
                       {value}
                     </a>
                   ) : label === "Restaurant Website" && value ? (
-                    <a className="underline decoration-black/30 underline-offset-2 hover:decoration-black" href={value} target="_blank" rel="noreferrer">
+                    <a className="break-all underline decoration-black/30 underline-offset-2 hover:decoration-black" href={value} target="_blank" rel="noreferrer">
                       {value}
                     </a>
                   ) : label === "Designer" && hasDesigner && sign.designer_url ? (

@@ -97,7 +97,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
 
     const bounds: [number, number][] = [];
 
-    mappedSigns.forEach(({ sign, lat, lng }, position) => {
+    mappedSigns.forEach(({ sign, lat, lng }) => {
       const imageUrl = sign.image_processed_url || sign.image_original_url;
       const restaurant = escapeHtml(sign.restaurant_name || "Unknown Restaurant");
       const addressHtml = sign.formatted_address
@@ -107,13 +107,11 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
       const icon = leaflet.divIcon({
         className: "",
         html: `
-          <div class="grid h-9 w-9 place-items-center rounded-full border border-black bg-[#fdfdf9] font-mono text-[12px] text-black shadow-sm">
-            ${position + 1}
-          </div>
+          <div class="h-3.5 w-3.5 rounded-full border border-black/70 bg-[#f26a2e] shadow-[0_0_0_3px_rgba(253,253,249,0.85)]"></div>
         `,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18],
-        popupAnchor: [0, -22],
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+        popupAnchor: [0, -10],
       });
 
       const marker = leaflet.marker([lat, lng], { icon })
@@ -184,9 +182,9 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
   const activeModalSign = modalIndex === null ? null : mappedSigns[modalIndex]?.sign;
 
   return (
-    <section className="h-full bg-[#fdfdf9]">
+    <section className="h-[calc(100vh-188px)] min-h-[520px] bg-[#fdfdf9] max-lg:h-auto max-lg:min-h-0">
       <div className="grid h-full gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="relative min-h-[60vh] border-b border-black/10 lg:min-h-[calc(100vh-82px)] lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[60vh] border-b border-black/10 lg:min-h-0 lg:border-b-0 lg:border-r">
           <div ref={mapElementRef} className="absolute inset-0" />
           {mappedSigns.length === 0 && (
             <div className="absolute inset-0 z-[500] grid place-items-center bg-[#fdfdf9]/80 p-6 text-center text-sm text-black/45">
@@ -195,7 +193,7 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
           )}
         </div>
 
-        <div className="max-h-[calc(100vh-82px)] overflow-auto bg-[#fdfdf9]">
+        <div className="h-full overflow-auto bg-[#fdfdf9] max-lg:h-auto">
           <div className="sticky top-0 border-b border-black/10 bg-[#fdfdf9] p-4 font-mono text-[11px] uppercase text-black/50">
             {mappedSigns.length} Mapped Signs
           </div>

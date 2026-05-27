@@ -8,11 +8,11 @@ export default async function MapPage() {
   const signs = await listSigns({ publishedOnly: true });
 
   return (
-    <main className="min-h-screen bg-[#fdfdf9] text-[#151515]">
+    <main className="bg-[#fdfdf9] text-[#151515]">
       <header className="flex flex-wrap items-end justify-between gap-3 border-b border-black/10 px-4 py-5 md:px-7">
         <div>
           <p className="font-mono text-[11px] uppercase text-black/45">Map</p>
-          <Link href="/" className="display-title mt-1 block max-w-3xl text-4xl leading-[0.9] md:text-6xl">
+          <Link href="/" className="display-title mt-1 block max-w-3xl whitespace-nowrap text-3xl leading-[0.9] md:text-4xl">
             Choking Hazard Signs
           </Link>
         </div>
