@@ -9,6 +9,7 @@ import type { SignRecord } from "@/types/sign";
 
 type ViewMode = "icons" | "gallery";
 type SortMode = "featured" | "az" | "recent";
+const submitUrl = "https://x.com/gibsontchu";
 
 function sortValue(sign: SignRecord) {
   const value = Number(sign.sort_order);
@@ -69,21 +70,21 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
   }, [filteredSigns.length, modalIndex, viewMode]);
 
   return (
-    <div className="min-h-[calc(100vh-96px)] bg-[#fdfdf9] text-[#151515] md:grid md:grid-cols-[320px_1fr]">
-      <aside className="border-b border-black/10 p-5 md:sticky md:top-0 md:h-[calc(100vh-96px)] md:border-b-0 md:p-10">
-        <Link href="/" className="display-title block max-w-[15rem] text-[2rem] leading-[0.9] tracking-normal md:max-w-[13rem] md:text-[2.55rem]">
+    <div className="min-h-[calc(100vh-96px)] bg-[#fdfdf9] text-[#151515]">
+      <header className="grid gap-6 px-5 py-6 md:grid-cols-[minmax(260px,0.7fr)_minmax(0,1fr)] md:items-start md:px-10 md:py-8">
+        <Link href="/" className="display-title block max-w-[18rem] text-[2.25rem] leading-[0.9] tracking-normal md:max-w-[22rem] md:text-[3rem]">
           Choking Hazard Signs
         </Link>
 
-        <nav className="mt-8 grid gap-6 md:mt-11 md:gap-9">
+        <nav className="grid gap-5 md:ml-auto md:grid-cols-[auto_auto_auto] md:items-start md:gap-8 lg:gap-12">
           <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">View By</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
               {(["icons", "gallery"] as ViewMode[]).map((item) => (
                 <button
                   key={item}
                   type="button"
-                  className={`w-fit text-left text-lg font-semibold capitalize leading-tight ${viewMode === item ? "text-black" : "text-black/45 hover:text-black"}`}
+                  className={`w-fit text-left text-base font-semibold capitalize leading-tight md:text-lg ${viewMode === item ? "text-black" : "text-black/45 hover:text-black"}`}
                   onClick={() => setViewMode(item)}
                 >
                   {item}
@@ -94,7 +95,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
           <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Sort</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 md:grid md:gap-1">
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
               {[
                 ["featured", "Featured"],
                 ["az", "A-Z"],
@@ -103,7 +104,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
                 <button
                   key={value}
                   type="button"
-                  className={`w-fit text-left text-lg font-semibold leading-tight ${sortMode === value ? "text-black" : "text-black/45 hover:text-black"}`}
+                  className={`w-fit text-left text-base font-semibold leading-tight md:text-lg ${sortMode === value ? "text-black" : "text-black/45 hover:text-black"}`}
                   onClick={() => {
                     setSortMode(value as SortMode);
                     setGalleryIndex(0);
@@ -117,19 +118,19 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
 
           <div>
             <p className="mb-2 font-mono text-[11px] uppercase text-black/40">Pages</p>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:grid md:gap-1">
-              <span className="text-lg font-semibold text-black">Index</span>
-              <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/map">Map</Link>
-              <Link className="text-lg font-semibold text-black/45 hover:text-black" href="/about">About</Link>
-              <Link className="w-fit border border-black bg-black px-4 py-2 text-lg font-semibold leading-tight text-white hover:bg-white hover:text-black md:mt-3" href="/submit">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span className="text-base font-semibold text-black md:text-lg">Index</span>
+              <Link className="text-base font-semibold text-black/45 hover:text-black md:text-lg" href="/map">Map</Link>
+              <Link className="text-base font-semibold text-black/45 hover:text-black md:text-lg" href="/about">About</Link>
+              <Link className="w-fit border border-black bg-black px-4 py-2 text-base font-semibold leading-tight text-white hover:bg-white hover:text-black md:text-lg" href={submitUrl} target="_blank" rel="noreferrer">
                 Submit A Sign
               </Link>
             </div>
           </div>
         </nav>
-      </aside>
+      </header>
 
-      <section className="px-5 py-8 md:px-12 md:py-10">
+      <section className="px-5 py-8 md:px-10 md:py-10">
         {filteredSigns.length > 0 && viewMode === "icons" ? (
           <SignGrid signs={filteredSigns} onSelect={openModal} />
         ) : filteredSigns.length > 0 && selectedGallerySign ? (

@@ -3,6 +3,7 @@ import { SignMap } from "@/components/SignMap";
 import { listSigns } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
+const submitUrl = "https://x.com/gibsontchu";
 
 export default async function MapPage() {
   const signs = await listSigns({ publishedOnly: true });
@@ -19,7 +20,7 @@ export default async function MapPage() {
         <nav className="flex gap-4 text-sm font-medium">
           <Link className="text-black/45 hover:text-black" href="/">Index</Link>
           <Link className="text-black/45 hover:text-black" href="/about">About</Link>
-          <Link className="text-black/45 hover:text-black" href="/submit">Submit</Link>
+          <Link className="text-black/45 hover:text-black" href={submitUrl} target="_blank" rel="noreferrer">Submit</Link>
         </nav>
       </header>
       <SignMap signs={signs} />

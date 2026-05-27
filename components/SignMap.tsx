@@ -131,6 +131,10 @@ export function SignMap({ signs }: { signs: SignRecord[] }) {
         setSelectedSignId(sign.id);
         map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
       });
+      marker.on("mouseover", () => {
+        setSelectedSignId(sign.id);
+        marker.openPopup();
+      });
       markerRefs.current[sign.id] = marker;
       bounds.push([lat, lng]);
     });

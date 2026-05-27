@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const submitUrl = "https://x.com/gibsontchu";
+
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-[#fdfdf9] px-4 py-5 text-[#151515] md:px-7">
@@ -13,7 +15,7 @@ export default function AboutPage() {
         <nav className="flex gap-4 text-sm font-medium">
           <Link className="text-black/45 hover:text-black" href="/">Index</Link>
           <Link className="text-black/45 hover:text-black" href="/map">Map</Link>
-          <Link className="text-black/45 hover:text-black" href="/submit">Submit</Link>
+          <Link className="text-black/45 hover:text-black" href={submitUrl} target="_blank" rel="noreferrer">Submit</Link>
         </nav>
       </header>
 
@@ -77,7 +79,7 @@ export default function AboutPage() {
           If you’ve spotted a choking sign that belongs here, or if you yourself have designed, painted, commissioned, or own one, I’d love to hear from you.
         </p>
 
-        <Link className="mt-10 inline-flex border border-black bg-black px-5 py-3 text-base font-semibold leading-none text-white hover:bg-white hover:text-black" href="/submit">
+        <Link className="mt-10 inline-flex border border-black bg-black px-5 py-3 text-base font-semibold leading-none text-white hover:bg-white hover:text-black" href={submitUrl} target="_blank" rel="noreferrer">
           Submit A Sign
         </Link>
       </article>

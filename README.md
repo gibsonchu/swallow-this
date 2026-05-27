@@ -76,10 +76,10 @@ The app reads rows on the `Signs` tab and writes new signs to explicit rows. Lat
 - `/sign/[id]`: Public sign detail page.
 - `/map`: Public map view for published signs with latitude/longitude.
 - `/about`: Article-style project description.
-- `/submit`: Public submission form. Submissions go to the admin review tab.
+- `/submit`: Redirects to @gibsontchu on X for submission requests.
 - `/admin`: Password-gated admin upload and metadata dashboard.
 - `/api/signs`: `GET` published signs, authenticated `GET ?all=1` all signs, authenticated `POST` create sign, authenticated `PATCH` update sign, authenticated `DELETE` clear sign row.
-- `/api/submit`: Public sign submission endpoint.
+- `/api/submit`: Public submissions are closed and return `410 Gone`.
 - `/api/upload`: Authenticated image upload.
 - `/api/admin/login`: Admin login.
 - `/api/admin/logout`: Admin logout.
