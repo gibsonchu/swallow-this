@@ -21,7 +21,7 @@ export function SignCard({ sign, onSelect, priority = false }: { sign: SignRecor
         imageClassName="archive-image object-contain object-center drop-shadow-sm transition duration-200 group-hover:scale-[1.04]"
       />
       <div className="pt-3 text-[12px] leading-tight opacity-0 transition duration-200 group-hover:opacity-100 group-focus:opacity-100">
-        <p className="display-title text-[13px] leading-none text-black">{label}</p>
+        <p className="text-[13px] font-semibold leading-none text-black">{label}</p>
         <p className="mt-1 font-mono text-[10px] uppercase tracking-normal text-black/55">
           {[sign.borough, dateVisited].filter(Boolean).join(" / ") || "Date unknown"}
         </p>

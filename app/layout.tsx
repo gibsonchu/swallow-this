@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Geist_Mono } from "next/font/google";
+import { Archivo_Black } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const archivoBlack = Archivo_Black({
   variable: "--font-archivo-black",
@@ -27,11 +22,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistMono.variable} ${archivoBlack.variable} h-full`}
+      className={`${archivoBlack.variable} h-full`}
     >
       <body className="min-h-full antialiased">
         {children}
-        <footer className="border-t border-black/10 bg-[#fdfdf9] px-5 py-5 font-mono text-[11px] text-black/45 md:px-10">
+        <footer className="border-t border-black/10 bg-[#fdfdf9] px-5 py-5 text-[11px] text-black/45 md:px-10">
           <p className="mb-4 max-w-sm leading-5">
             A library of choking hazard signs around New York City.
           </p>

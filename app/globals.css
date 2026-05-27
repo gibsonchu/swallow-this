@@ -10,7 +10,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-mono: Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
   --font-display: "Archivo Black", "Arial Black", ui-sans-serif, system-ui, sans-serif;
 }
 

@@ -94,7 +94,7 @@ export function SignModal({
             <p className="font-mono text-[11px] uppercase text-black/45">
               {index + 1} / {total}
             </p>
-            <h2 className="display-title mt-4 break-words text-2xl leading-[0.95]">{sign.restaurant_name || "Unknown Restaurant"}</h2>
+            <h2 className="mt-4 break-words text-2xl font-semibold leading-[0.95]">{sign.restaurant_name || "Unknown Restaurant"}</h2>
           </div>
           <dl className="grid min-w-0 gap-px overflow-hidden border border-black/10 text-sm">
             {metadata.map(([label, value]) => (

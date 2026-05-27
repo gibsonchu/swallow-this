@@ -131,7 +131,7 @@ export function ArchiveExplorer({ signs }: { signs: SignRecord[] }) {
                   imageClassName="archive-image object-contain object-center transition group-hover:scale-[1.01]"
                 />
                 <span className="text-center">
-                  <span className="display-title block text-xl leading-none">{selectedGallerySign.restaurant_name || "Unknown Restaurant"}</span>
+                  <span className="block text-xl font-semibold leading-none">{selectedGallerySign.restaurant_name || "Unknown Restaurant"}</span>
                   <span className="mt-1 block font-mono text-[11px] uppercase text-black/45">
                     {[selectedGallerySign.borough, selectedGallerySign.date_visited || selectedGallerySign.date_collected].filter(Boolean).join(" / ") || "Unlabeled"}
                   </span>

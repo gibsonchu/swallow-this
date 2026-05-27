@@ -17,7 +17,7 @@ export default async function AdminPage() {
           method="post"
         >
           <div>
-            <h1 className="display-title text-2xl leading-none">Choking Hazard Signs Admin</h1>
+            <h1 className="text-2xl font-semibold leading-none">Choking Hazard Signs Admin</h1>
             <p className="mt-1 text-sm text-black/55">Enter the index password.</p>
           </div>
           <label className="grid gap-1 text-sm">
@@ -36,7 +36,7 @@ export default async function AdminPage() {
     <main className="min-h-screen bg-[#fdfdf9] px-4 py-5 text-[#151515] md:px-7">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-5">
         <div>
-          <Link href="/" className="display-title block text-3xl leading-none">
+          <Link href="/" className="block text-3xl font-semibold leading-none">
             Choking Hazard Signs Admin
           </Link>
           <p className="mt-2 text-sm text-black/55">Upload, annotate, edit, and publish signs.</p>

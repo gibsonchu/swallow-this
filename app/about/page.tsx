@@ -8,6 +8,8 @@ export default function AboutPage() {
       <SiteHeader active="about" />
 
       <article className="mx-auto mb-24 max-w-3xl px-4 py-10 text-[19px] leading-8 text-black/80 md:mb-36 md:px-7">
+        <h1 className="mb-8 text-4xl font-semibold tracking-normal text-black md:text-5xl">About</h1>
+
         <p>
           In 1978, New York City passed a law requiring restaurants to publicly display instructions for helping someone who is choking. Today, the regulation lives on in New York City Administrative Code § 17-172:
         </p>
