@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Archivo_Black, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -33,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${geistMono.variable} ${archivoBlack.variable} h-full`}
+      className={`${geistMono.variable} ${archivoBlack.variable} h-full`}
     >
       <body className="min-h-full antialiased">
         {children}

@@ -9,7 +9,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Space Grotesk", "Space Grotesk Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
   --font-display: "Archivo Black", "Arial Black", ui-sans-serif, system-ui, sans-serif;
 }
@@ -17,7 +17,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-space-grotesk), Arial, Helvetica, sans-serif;
+  font-family: Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
 }
 
 button,
@@ -48,7 +48,7 @@ textarea {
 
 .leaflet-container {
   background: #f4f4ee;
-  font-family: var(--font-space-grotesk), Arial, Helvetica, sans-serif;
+  font-family: Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
 }
 
 .sign-map-popup .leaflet-popup-content-wrapper {
